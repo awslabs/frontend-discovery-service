@@ -32,9 +32,9 @@ The schema covers the following use cases:
 ## Roadmap
 
 - March 2022 to April 2022: Formed a group of core contributors consisting of [Joel Denning](https://github.com/joeldenning), [Luca Mezzalira](https://github.com/lucamezzalira), [Matteo Figus](https://github.com/matteofigus) and [Zack Jackson](https://github.com/ScriptedAlchemy) and defined motivation and project goals
-- April 2022 to June 2022: Worked on the [first version of the discovery Schema](./schema/v1.json)
+- April 2022 to June 2022: Worked on the [first candidate for the discovery Schema](schema/v1-pre.json)
 - July 2022: Open Github Repository for public consumption, discussion and allow creation of RFCs
-- July 2022-?: Creation of JavaScript Vanilla Library and Framework specific POCs
+- July 2022-?: Creation of JavaScript Vanilla Library and Framework specific POCs to validate schema v1 candidate
 - July 2022-?: Create Documentation, website, and schema validation mechanisms
 
 ## Contributing with RFCs
