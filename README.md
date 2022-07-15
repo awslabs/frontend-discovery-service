@@ -29,13 +29,63 @@ The schema covers the following use cases:
 - introduce deployment mechanisms such as canary releases and blue-green deployment for applications
 - allow extensibility for different use cases specific to company (e.g.: country-based deployment) and framework specific implementations
 
+This is an example of the [latest schema implementation](schema/):
+
+```json
+{
+  "schema": "https://mfewg.org/schema/v1-pre.json",
+  "microFrontends": {
+    "@my-project/catalog": [
+      {
+        "url": "https://static.website.com/my-catalog-1.3.5.js",
+        "fallbackUrl": "https://alt-cdn.com/my-catalog-1.3.5.js",
+        "metadata": {
+          "integrity": "e0d123e5f316bef78bfdf5a008837577",
+          "version": "1.3.5"
+        },
+        "extras": {
+          "modulefederation": {
+            "prefetch": ["@my-project/myaccount"]
+          }
+        }
+      }
+    ],
+    "@my-project/myaccount": [
+      {
+        "url": "https://static.website.com/my-account-1.2.2.js",
+        "fallbackUrl": "https://alt-cdn.com/my-account-1.2.2.js",
+        "metadata": {
+          "integrity": "e0d123e5f316bef78bfdf5a008837577",
+          "version": "1.2.2"
+        },
+        "deployment": {
+          "traffic": 30,
+          "default": false
+        }
+      },
+      {
+        "url": "https://static.website.com/my-account-2.0.0.js",
+        "fallbackUrl": "https://alt-cdn.com/my-account-2.0.0.js",
+        "metadata": {
+          "integrity": "e0d123e5f316bef78bfdf5a008837577",
+          "version": "2.0.0"
+        },
+        "deployment": {
+          "traffic": 70,
+          "default": true
+        }
+      }
+    ]
+  }
+}
+```
+
 ## Roadmap
 
 - March 2022 to April 2022: Formed a group of core contributors consisting of [Joel Denning](https://github.com/joeldenning), [Luca Mezzalira](https://github.com/lucamezzalira), [Matteo Figus](https://github.com/matteofigus) and [Zack Jackson](https://github.com/ScriptedAlchemy) and defined motivation and project goals
 - April 2022 to June 2022: Worked on the [first candidate for the discovery Schema](schema/v1-pre.json)
 - July 2022: Open Github Repository for public consumption, discussion and allow creation of RFCs
-- July 2022-?: Creation of JavaScript Vanilla Library and Framework specific POCs to validate schema v1 candidate
-- July 2022-?: Create Documentation, website, and schema validation mechanisms
+- Q3 2022-?: Creation of JavaScript Vanilla Library and Framework specific POCs to validate schema v1 candidate; improve documentation and iterate on schema after gathering feedback from community
 
 ## Contributing with RFCs
 
@@ -45,7 +95,7 @@ An RFC is a document that proposes a change to the project. _Request for Comment
 
 ### RFC Process
 
-This team is still defining the best process to work on RFCs. For the time being, everyone can create an RFC proposal about the project, the JSON schema and the roadmap by opening an Issue in Github. 
+This team is still defining the best process to work on RFCs. For the time being, everyone can create an RFC proposal about the project, the JSON schema and the roadmap by opening an Issue in Github.
 
 ## Contributing
 
