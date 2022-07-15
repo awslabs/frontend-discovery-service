@@ -42,15 +42,20 @@
                 "additionalProperties": false
               },
               "extras": {
+                "$comment": "An object that can be used by framework-specific implementations to extend the configuration",
                 "type": "object"
               },
               "deployment": {
                 "type": "object",
                 "properties": {
                   "traffic": {
-                    "type": "integer"
+                    "$comment": "Percentage of traffic currently being served",
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 100
                   },
                   "default": {
+                    "$comment": "Default traffic route to be used in case of unretriable errors",
                     "type": "boolean"
                   }
                 },
