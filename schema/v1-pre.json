@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "$comment": "The version of the current schema such as https://github.com/awslabs/frontend-discovery/blob/main/schema/v1-pre.json",
+      "type": "string"
+    },
+    "microFrontends": {
+      "$comment": "Map containing the microfrontends using an arbitrary descriptor such as `MFA` or `@org/mfaX`",
+      "type": "object",
+      "additionalProperties": {
+        "$comment": "Array of multiple versions of a micro-frontend",
+        "type": "array",
+        "uniqueItems": true,
+        "items": [
+          {
+            "type": "object",
+            "properties": {
+              "url": {
+                "$comment": "url of the entrypoint. It can be absolute or relative, and it doesn't mandate Javascript. Valid examples are `/mf.js`, `https://website.com/v1/mf.js`, `https://localhost/entry.html`",
+                "type": "string"
+              },
+              "fallbackUrl": {
+                "$comment": "optional url to be used in case of a retriable error when fetching $url",
+                "type": "string"
+              },
+              "metadata": {
+                "$comment": "Object containing idempotent properties of a version",
+                "type": "object",
+                "properties": {
+                  "integrity": {
+                    "$comment": "String used to perform checksum",
+                    "type": "string"
+                  },
+                  "version": {
+                    "$comment": "String to define version. Does not mandate any format",
+                    "type": "string"
+                  }
+                },
+                "required": ["integrity", "version"],
+                "additionalProperties": false
+              },
+              "extras": {
+                "type": "object"
+              },
+              "deployment": {
+                "type": "object",
+                "properties": {
+                  "traffic": {
+                    "type": "integer"
+                  },
+                  "default": {
+                    "type": "boolean"
+                  }
+                },
+                "required": ["traffic", "default"]
+              }
+            },
+            "additionalProperties": false,
+            "required": ["url", "metadata"]
+          }
+        ]
+      }
+    }
+  },
+  "required": ["schema", "microFrontends"],
+  "additionalProperties": false
+}
