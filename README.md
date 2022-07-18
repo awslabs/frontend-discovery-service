@@ -83,7 +83,7 @@ This is an example of the [latest schema implementation](schema/):
 
 - March 2022 to April 2022: Formed a group of core contributors consisting of [Joel Denning](https://github.com/joeldenning), [Luca Mezzalira](https://github.com/lucamezzalira), [Matteo Figus](https://github.com/matteofigus) and [Zack Jackson](https://github.com/ScriptedAlchemy) and defined motivation and project goals
 - April 2022 to June 2022: Worked on the [first candidate for the discovery Schema](schema/v1-pre.json)
-- July 2022: Open Github Repository for public consumption, discussion and allow creation of RFCs
+- August 2022: Open Github Repository for public consumption, discussion and allow creation of RFCs
 - Q4 2022 until Q1 2023: Creation of JavaScript Vanilla Library and Framework specific POCs to validate schema v1 candidate, add documentation, add code examples and iterate on schema after gathering feedback from community
 
 ## Contributing with RFCs
