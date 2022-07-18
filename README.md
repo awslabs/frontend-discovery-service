@@ -1,27 +1,26 @@
 # Frontend Discovery
 
-This repository hosts schema, documentation and RFCs for the Frontend Discovery project.
+This repository contains schema, documentation and RFCs for the Frontend Discovery project.
 
 ## Summary
 
-The aim of this project is creating a JSON schema describing the discoverability of client-side rendering (CSR), server-side rendering (SSR) and edge-side rendering (ESR) micro-frontends. The schema has to take into account not only the entry point of a micro-frontend but also additional deployment capabilities to increase the confidence of developers to deploy in every environment safely.
+The aim of this project is to define and drive adoption of a frontend discovery pattern, with a primary focus on client-side rendered (CSR), server-side rendered (SSR) and edge-side rendered (ESR) micro-frontends.
+The frontend discovery pattern improves the development experience when developing, testing, and delivering micro-frontends by making use of a shareable configuration describing the entry point of micro-frontends, as well as additional metadata that can be used to deploy in every environment safely.
 
 ### Motivation
 
-There are many client-side rendering frameworks and libraries for building micro-frontends such as Single SPA, Module Federation, Luigi Framework and more.  
-They are all doing a great job composing micro-frontends in a single view (horizontal split) or as standalone artifact loaded by an application shell (vertical split), facilitating the development experience and provide utilities for overcoming common challenges during the development of a micro-frontends application.
-The only part not covered properly by any of these framework is the micro-frontends discoverability.  
-In distributed architectures like microservices, we have mechanisms for consuming the endpoint of a specific service without the need to know exactly the URL. The [service discovery pattern](https://microservices.io/patterns/server-side-discovery.html) allows to associate an unique identifier to a URL that is managed by the service team who manage the service.  
+There are many client-side rendering frameworks and libraries for building micro-frontends such as Single SPA, Module Federation, Luigi Framework and more.
+They are all doing a great job composing micro-frontends in a single view (horizontal split) or as standalone artifact loaded by an application shell (vertical split), facilitating the development experience and provide utilities for overcoming common challenges during the development of a micro-frontends application. However, currently none of these frameworks address micro-frontends discoverability.
+In distributed architectures like micro-services, there are mechanisms to consume a specific service without knowing its endpoint URL. The [service discovery pattern](https://microservices.io/patterns/server-side-discovery.html) allows to associate a unique identifier to a URL that is managed by the service team who manage the service.
 In this way, the team can change the underline infrastructure and even the service URL, without the need to coordinate with all the consumer of their API. The service team is decoupled from the rest of the consumers and it has the capability to work autonomously reducing the time to market of their implementations.
 
-This is a common challenge for distributed systems on the backend, but so far there isn't an alternative for distributed systems on the frontend.  
-**That's the reason why we want to introduce a micro-frontends discovery pattern.**
-This gap in client-side rendering implementations is a common challenge for every micro-frontends application and every company is solving in different ways: injecting the URL during the CI pipeline, creating browsers extensions for allowing developers to quickly test their micro-frontends autonomously and so on.
-However, we didn't find a consistent way to look at the problem that is not only enabling to retrieve the entry point of a micro-frontend but also improving the deployment process with mechanisms such as _canary release_, _blue-green deployment_ or _role-based deployment_.
+This is a common challenge for distributed systems on the backend, but so far there isn't an alternative for distributed systems on the frontend. **That's the reason why we want to introduce a micro-frontends discovery pattern.**
 
-After we solve this challenge, we will be able to create a foundational library in Vanilla JavaScript that abstracts the complexity and it is easily integrated with all the CSR micro-frontend frameworks.
+This gap in client-side rendering implementations is a common challenge for every micro-frontends application and every company is solving in different ways: injecting the URL during the CI pipeline, creating browsers extensions for allowing developers to quickly test their micro-frontends autonomously and so on. However, we didn't find a consistent way to look at the problem that is not only enabling to retrieve the entry point of a micro-frontend but also improving the deployment process with mechanisms such as _canary release_, _blue-green deployment_ or _role-based deployment_.
 
-### JSON Schema
+The goal of this project is defining a the discoverability schema, and provide examples and foundational libraries in Vanilla JavaScript that can abstract the complexity and be easily integrated with all the most popular micro-frontend frameworks.
+
+### Discoverability Schema
 
 The schema covers the following use cases:
 
@@ -97,12 +96,20 @@ An RFC is a document that proposes a change to the project. _Request for Comment
 
 This team is still defining the best process to work on RFCs. For the time being, everyone can create an RFC proposal about the project, the JSON schema and the roadmap by opening an Issue in Github.
 
-## Contributing
+### Security issue notifications
 
-Contributions are more than welcome. Please read the
-[code of conduct](CODE_OF_CONDUCT.md) and the
-[contributing guidelines](CONTRIBUTING.md).
+If you discover a potential security issue in this project we ask that you
+notify AWS/Amazon Security via our
+[vulnerability reporting page](http://aws.amazon.com/security/vulnerability-reporting/).
+Please do **not** create a public github issue.
 
-## License Summary
+### Licensing
 
-This project is licensed under the Apache-2.0 License.
+See the
+[LICENSE](LICENSE)
+file for our project's licensing. We will ask you to confirm the licensing of
+your contribution.
+
+We may ask you to sign a
+[Contributor License Agreement (CLA)](http://en.wikipedia.org/wiki/Contributor_License_Agreement)
+for larger changes.
