@@ -1,0 +1,12 @@
+{
+  "activeVersions": [
+    {
+      "traffic": 100,
+      "version": "1.2.2"
+    }
+  ],
+  "default": "1.2.2",
+  "microFrontendId": "1fd2800e-2740-43e5-ad7e-5af54c91f12e",
+  "name": "catalog",
+  "projectId": "dcc549d8-bd0c-49d2-bff8-f6fa80fb7856"
+}

@@ -1,0 +1,457 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Frontend service discovery
+
+Globals:
+  Function:
+    Runtime: nodejs16.x
+    Architectures:
+      - arm64
+    Tracing: Active
+
+Parameters:
+  Stage:
+    Type: String
+    Default: prod
+
+  LogLevel:
+    Type: String
+    Default: INFO
+    AllowedValues:
+      - CRITICAL
+      - FATAL
+      - ERROR
+      - WARNING
+      - INFO
+      - DEBUG
+      - NOTSET
+
+  AccessControlAllowOrigin:
+    Type: String
+    Description: The cors configuration for allow-origin for the consumer API. Specify a domain or * to allow all.
+
+  DefaultUserEmail:
+    Type: String
+    Default: ""
+    Description: Optional email for the default user for the ci/cd API. Leave blank to skip creation
+
+  CognitoAdvancedSecurity:
+    Description: The type of Cognito advanced security to enable. Disabled by default.
+    Type: String
+    Default: "OFF"
+    AllowedValues:
+      - "OFF"
+      - "AUDIT"
+      - "ENFORCED"
+
+  DeleteExpiryMinutes:
+    Description: The type of Cognito advanced security to enable. Disabled by default.
+    Type: Number
+    Default: 1440
+
+Conditions:
+  CreateUser: !Not [!Equals [!Ref DefaultUserEmail, ""]]
+
+Resources:
+  ProjectStore:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: "projectId"
+          AttributeType: "S"
+      BillingMode: PAY_PER_REQUEST
+      KeySchema:
+        - AttributeName: "projectId"
+          KeyType: "HASH"
+      StreamSpecification:
+        StreamViewType: NEW_IMAGE
+      TimeToLiveSpecification:
+        AttributeName: "expiresAt"
+        Enabled: true
+
+  FrontendStore:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: "projectId"
+          AttributeType: "S"
+        - AttributeName: "microFrontendId"
+          AttributeType: "S"
+      BillingMode: PAY_PER_REQUEST
+      KeySchema:
+        - AttributeName: "projectId"
+          KeyType: "HASH"
+        - AttributeName: "microFrontendId"
+          KeyType: "RANGE"
+      StreamSpecification:
+        StreamViewType: NEW_IMAGE
+      TimeToLiveSpecification:
+        AttributeName: "expiresAt"
+        Enabled: true
+
+  ConsumerViewStore:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: "projectId"
+          AttributeType: "S"
+        - AttributeName: "microFrontendId"
+          AttributeType: "S"
+      BillingMode: PAY_PER_REQUEST
+      KeySchema:
+        - AttributeName: "projectId"
+          KeyType: "HASH"
+        - AttributeName: "microFrontendId"
+          KeyType: "RANGE"
+
+  DeploymentStore:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: "deploymentId"
+          AttributeType: "S"
+        - AttributeName: "sk"
+          AttributeType: "S"
+      BillingMode: PAY_PER_REQUEST
+      KeySchema:
+        - AttributeName: "deploymentId"
+          KeyType: "HASH"
+        - AttributeName: "sk"
+          KeyType: "RANGE"
+      TimeToLiveSpecification:
+        AttributeName: "expiresAt"
+        Enabled: true
+
+  VersionStore:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: "microFrontendId"
+          AttributeType: "S"
+        - AttributeName: "version"
+          AttributeType: "S"
+      BillingMode: PAY_PER_REQUEST
+      KeySchema:
+        - AttributeName: "microFrontendId"
+          KeyType: "HASH"
+        - AttributeName: "version"
+          KeyType: "RANGE"
+      TimeToLiveSpecification:
+        AttributeName: "expiresAt"
+        Enabled: true
+
+  ConsumerApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: !Ref Stage
+      Cors: !Sub "'${AccessControlAllowOrigin}'"
+      TracingEnabled: true
+
+  StreamHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/lambda/stream
+      Handler: app.handler
+      Timeout: 60
+      Environment:
+        Variables:
+          LOG_LEVEL: !Ref LogLevel
+          REGION: !Ref "AWS::Region"
+          POWERTOOLS_SERVICE_NAME: streamHandler
+          CONSUMER_STORE: !Ref ConsumerViewStore
+          PROJECT_STORE: !Ref ProjectStore
+          FRONTEND_STORE: !Ref FrontendStore
+          VERSION_STORE: !Ref VersionStore
+          ALLOW_ORIGIN: !Ref AccessControlAllowOrigin
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ConsumerViewStore
+        - DynamoDBReadPolicy:
+            TableName: !Ref ProjectStore
+        - DynamoDBCrudPolicy:
+            TableName: !Ref FrontendStore
+        - DynamoDBCrudPolicy:
+            TableName: !Ref VersionStore
+      Events:
+        ProjectStream:
+          Type: DynamoDB
+          Properties:
+            Stream: !GetAtt ProjectStore.StreamArn
+            StartingPosition: TRIM_HORIZON
+            Enabled: true
+            FilterCriteria:
+              Filters:
+                - Pattern: '{"userIdentity": [ { "exists": false } ]}'
+        FrontendStream:
+          Type: DynamoDB
+          Properties:
+            Stream: !GetAtt FrontendStore.StreamArn
+            StartingPosition: TRIM_HORIZON
+            Enabled: true
+            FilterCriteria:
+              Filters:
+                - Pattern: '{"userIdentity": [ { "exists": false } ]}'
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: false
+        Target: "es2020"
+        Sourcemap: false
+        EntryPoints:
+          - app.js
+
+  ConsumerHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/lambda/consumerApi
+      Handler: app.handler
+      Timeout: 10
+      Environment:
+        Variables:
+          LOG_LEVEL: !Ref LogLevel
+          REGION: !Ref "AWS::Region"
+          POWERTOOLS_SERVICE_NAME: consumerApi
+          CONSUMER_STORE: !Ref ConsumerViewStore
+          ALLOW_ORIGIN: !Ref AccessControlAllowOrigin
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref ConsumerViewStore
+      Events:
+        Any:
+          Type: Api
+          Properties:
+            Path: /projects/{projectId}/microFrontends
+            Method: GET
+            RestApiId: !Ref ConsumerApi
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: false
+        Target: "es2020"
+        Sourcemap: false
+        EntryPoints:
+          - app.js
+
+  UserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      AdminCreateUserConfig:
+        AllowAdminCreateUserOnly: true
+        InviteMessageTemplate:
+          EmailMessage: "Your Frontend Service Discovery username is {username} and the temporary password is {####}"
+          EmailSubject: "Your temporary password for Frontend Service Discovery"
+      AutoVerifiedAttributes:
+        - email
+      UserPoolAddOns:
+        AdvancedSecurityMode: !Ref CognitoAdvancedSecurity
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+          RequireLowercase: true
+          RequireNumbers: true
+          RequireSymbols: true
+          RequireUppercase: true
+
+  UserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      UserPoolId: !Ref UserPool
+      SupportedIdentityProviders:
+        - COGNITO
+
+  CognitoUserPoolAdmin:
+    Condition: CreateUser
+    Type: AWS::Cognito::UserPoolUser
+    Properties:
+      Username: admin
+      DesiredDeliveryMediums:
+        - EMAIL
+      UserPoolId: !Ref UserPool
+      UserAttributes:
+        - Name: email
+          Value: !Ref DefaultUserEmail
+        - Name: email_verified
+          Value: "True"
+
+  CICDAPI:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: !Ref Stage
+      TracingEnabled: true
+      Auth:
+        AddDefaultAuthorizerToCorsPreflight: false
+        DefaultAuthorizer: Cognito
+        Authorizers:
+          Cognito:
+            UserPoolArn: !GetAtt UserPool.Arn
+
+  CICDHandler:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/lambda/cicd
+      Handler: app.handler
+      Timeout: 10
+      Environment:
+        Variables:
+          LOG_LEVEL: !Ref LogLevel
+          ACCOUNT_ID: !Ref "AWS::AccountId"
+          REGION: !Ref "AWS::Region"
+          POWERTOOLS_SERVICE_NAME: cicdApi
+          PROJECT_STORE: !Ref ProjectStore
+          FRONTEND_STORE: !Ref FrontendStore
+          DEPLOYMENT_STORE: !Ref DeploymentStore
+          VERSION_STORE: !Ref VersionStore
+          DEPLOYMENT_STATE_MACHINE_ARN: !Ref DeploymentStateMachine
+          DEPLOYMENT_STATE_MACHINE_NAME: !GetAtt DeploymentStateMachine.Name
+          DELETE_EXPIRY_MINUTES: !Ref DeleteExpiryMinutes
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ProjectStore
+        - DynamoDBCrudPolicy:
+            TableName: !Ref FrontendStore
+        - DynamoDBCrudPolicy:
+            TableName: !Ref DeploymentStore
+        - DynamoDBCrudPolicy:
+            TableName: !Ref VersionStore
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - states:StartExecution
+              Resource: !Ref DeploymentStateMachine
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - states:StopExecution
+              Resource: !Sub "arn:aws:states:eu-west-1:${AWS::AccountId}:execution:${DeploymentStateMachine.Name}:*"
+      Events:
+        GetProjects:
+          Type: Api
+          Properties:
+            Path: /projects
+            Method: GET
+            RestApiId: !Ref CICDAPI
+        PostProjects:
+          Type: Api
+          Properties:
+            Path: /projects
+            Method: POST
+            RestApiId: !Ref CICDAPI
+        PatchProject:
+          Type: Api
+          Properties:
+            Path: /projects/{projectId}
+            Method: PATCH
+            RestApiId: !Ref CICDAPI
+        DeleteProject:
+          Type: Api
+          Properties:
+            Path: /projects/{projectId}
+            Method: DELETE
+            RestApiId: !Ref CICDAPI
+        DeleteMicroFrontend:
+          Type: Api
+          Properties:
+            Path: /projects/{projectId}/microFrontends/{microFrontendId}
+            Method: DELETE
+            RestApiId: !Ref CICDAPI
+        GetMicroFrontends:
+          Type: Api
+          Properties:
+            Path: /projects/{projectId}/microFrontends
+            Method: GET
+            RestApiId: !Ref CICDAPI
+        GetMicroFrontendVersions:
+          Type: Api
+          Properties:
+            Path: /projects/{projectId}/microFrontends/{microFrontendId}/versions
+            Method: GET
+            RestApiId: !Ref CICDAPI
+        PostMicroFrontends:
+          Type: Api
+          Properties:
+            Path: /projects/{projectId}/microFrontends
+            Method: POST
+            RestApiId: !Ref CICDAPI
+        PatchMicroFrontend:
+          Type: Api
+          Properties:
+            Path: /projects/{projectId}/microFrontends/{microFrontendId}
+            Method: PATCH
+            RestApiId: !Ref CICDAPI
+        PostMicroFrontendVersion:
+          Type: Api
+          Properties:
+            Path: /projects/{projectId}/microFrontends/{microFrontendId}/versions
+            Method: POST
+            RestApiId: !Ref CICDAPI
+        PostDeployment:
+          Type: Api
+          Properties:
+            Path: /projects/{projectId}/microFrontends/{microFrontendId}/deployment
+            Method: POST
+            RestApiId: !Ref CICDAPI
+        DeleteDeployment:
+          Type: Api
+          Properties:
+            Path: /projects/{projectId}/microFrontends/{microFrontendId}/deployment/{deploymentId}
+            Method: DELETE
+            RestApiId: !Ref CICDAPI
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: false
+        Target: "es2020"
+        Sourcemap: false
+        EntryPoints:
+          - app.js
+
+  StateMachineRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: !Sub "states.${AWS::Region}.amazonaws.com"
+            Action: "sts:AssumeRole"
+      Policies:
+        - PolicyName: dynamodb
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:GetItem
+                  - dynamodb:UpdateItem
+                Resource:
+                  - !Sub arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${FrontendStore}
+                  - !GetAtt DeploymentStore.Arn
+
+  DeploymentStateMachine:
+    Type: AWS::StepFunctions::StateMachine
+    Properties:
+      Definition:
+        Fn::Transform:
+          Name: AWS::Include
+          Parameters:
+            Location: src/stepfunctions/deploymentASL.json
+      RoleArn: !GetAtt StateMachineRole.Arn
+
+Outputs:
+  ConsumerApi:
+    Description: "ConsumerApi API Gateway endpoint URL"
+    Value: !Sub "https://${ConsumerApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}"
+  CICDApi:
+    Description: "CI/CD API Gateway endpoint URL"
+    Value: !Sub "https://${CICDAPI}.execute-api.${AWS::Region}.amazonaws.com/${Stage}"
+  CognitoUserPoolArn:
+    Description: Cognito User Pool Arn
+    Value: !GetAtt UserPool.Arn
+  CognitoUserPoolId:
+    Description: Cognito User Pool Id
+    Value: !Ref UserPool
+  CognitoUserPoolClientId:
+    Description: Cognito User Pool Client Id
+    Value: !Ref UserPoolClient

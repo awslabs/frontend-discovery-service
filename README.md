@@ -2,6 +2,32 @@
 
 This repository contains schema, documentation and RFCs for the Frontend Discovery project.
 
+## Deployment
+
+First deploy:
+
+```
+sam build
+sam deploy --guided
+```
+
+Subsequent deploys:
+
+```
+sam build && sam deploy
+```
+
+## Test
+
+Run tests using:
+
+```
+npm test
+```
+
+If you have deployed the infrastructure, set the environment variable `STACK_NAME` to include integration tests.
+
+
 ## Summary
 
 The aim of this project is to define and drive adoption of a frontend discovery pattern, with a primary focus on client-side rendered (CSR), server-side rendered (SSR) and edge-side rendered (ESR) micro-frontends.
