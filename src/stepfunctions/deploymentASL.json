@@ -1,0 +1,277 @@
+{
+  "Comment": "Deployment orchestration",
+  "StartAt": "Init",
+  "States": {
+    "Apply next state": {
+      "Next": "Update deployment record",
+      "Parameters": {
+        "ExpressionAttributeNames": {
+          "#def": "default"
+        },
+        "ExpressionAttributeValues": {
+          ":defaultVersion": {
+            "S.$": "$.next.Item.state.M.default.S"
+          },
+          ":versions": {
+            "L.$": "$.next.Item.state.M.activeVersions.L"
+          }
+        },
+        "Key": {
+          "microFrontendId": {
+            "S.$": "States.Format('{}',$.mfeId)"
+          },
+          "projectId": {
+            "S.$": "$.projectId"
+          }
+        },
+        "TableName.$": "$.mfeTable",
+        "UpdateExpression": "SET activeVersions = :versions, #def = :defaultVersion"
+      },
+      "Resource": "arn:aws:states:::dynamodb:updateItem",
+      "ResultPath": "$.updateResult",
+      "Type": "Task"
+    },
+    "Done?": {
+      "Choices": [
+        {
+          "Comment": "Yes",
+          "Next": "Mark deployment complete",
+          "NumericEqualsPath": "$.endIndex",
+          "Variable": "$.position.currentIndex"
+        }
+      ],
+      "Default": "Wait",
+      "Type": "Choice"
+    },
+    "Get MFE": {
+      "Next": "Is MFE marked as deleted?",
+      "Parameters": {
+        "Key": {
+          "microFrontendId": {
+            "S.$": "States.Format('{}',$.mfeId)"
+          },
+          "projectId": {
+            "S.$": "$.projectId"
+          }
+        },
+        "TableName.$": "$.mfeTable"
+      },
+      "Resource": "arn:aws:states:::dynamodb:getItem",
+      "ResultPath": "$.mfe",
+      "Type": "Task"
+    },
+    "Get next state": {
+      "Next": "Next state exists?",
+      "Parameters": {
+        "Key": {
+          "deploymentId": {
+            "S.$": "$$.Execution.Name"
+          },
+          "sk": {
+            "S.$": "States.Format('state#{}',$.position.currentIndex)"
+          }
+        },
+        "TableName.$": "$.deploymentTable"
+      },
+      "Resource": "arn:aws:states:::dynamodb:getItem",
+      "ResultPath": "$.next",
+      "Type": "Task"
+    },
+    "Increment currentIndex": {
+      "Next": "Get MFE",
+      "Parameters": {
+        "currentIndex.$": "States.MathAdd($.position.currentIndex, 1)"
+      },
+      "ResultPath": "$.position",
+      "Type": "Pass"
+    },
+    "Init": {
+      "Next": "Set deployment id",
+      "Parameters": {
+        "currentIndex": 0
+      },
+      "ResultPath": "$.position",
+      "Type": "Pass"
+    },
+    "Is MFE marked as deleted?": {
+      "Choices": [
+        {
+          "And": [
+            {
+              "IsPresent": true,
+              "Variable": "$.mfe.Item.deleted"
+            },
+            {
+              "BooleanEquals": true,
+              "Variable": "$.mfe.Item.deleted.BOOL"
+            }
+          ],
+          "Comment": "Yes",
+          "Next": "Mark deployment aborted"
+        }
+      ],
+      "Default": "Get next state",
+      "Type": "Choice"
+    },
+    "Mark deployment aborted": {
+      "Next": "Unset deployment id",
+      "Parameters": {
+        "ExpressionAttributeValues": {
+          ":now": {
+            "S.$": "$$.State.EnteredTime"
+          },
+          ":s": {
+            "S": "ABORTED"
+          }
+        },
+        "Key": {
+          "deploymentId": {
+            "S.$": "$$.Execution.Name"
+          },
+          "sk": {
+            "S": "detail"
+          }
+        },
+        "TableName.$": "$.deploymentTable",
+        "UpdateExpression": "SET endedAt = :now, currentStatus = :s"
+      },
+      "Resource": "arn:aws:states:::dynamodb:updateItem",
+      "ResultPath": "$.updateResult",
+      "Type": "Task"
+    },
+    "Mark deployment as failed": {
+      "Next": "Unset deployment id",
+      "Parameters": {
+        "ExpressionAttributeValues": {
+          ":now": {
+            "S.$": "$$.State.EnteredTime"
+          },
+          ":s": {
+            "S": "FAILED"
+          }
+        },
+        "Key": {
+          "deploymentId": {
+            "S.$": "$$.Execution.Name"
+          },
+          "sk": {
+            "S": "detail"
+          }
+        },
+        "TableName.$": "$.deploymentTable",
+        "UpdateExpression": "SET failedAt = :now, currentStatus = :s"
+      },
+      "Resource": "arn:aws:states:::dynamodb:updateItem",
+      "Type": "Task"
+    },
+    "Mark deployment complete": {
+      "Next": "Unset deployment id",
+      "Parameters": {
+        "ExpressionAttributeValues": {
+          ":now": {
+            "S.$": "$$.State.EnteredTime"
+          },
+          ":s": {
+            "S": "COMPLETE"
+          }
+        },
+        "Key": {
+          "deploymentId": {
+            "S.$": "$$.Execution.Name"
+          },
+          "sk": {
+            "S": "detail"
+          }
+        },
+        "TableName.$": "$.deploymentTable",
+        "UpdateExpression": "SET endedAt = :now, currentStatus = :s"
+      },
+      "Resource": "arn:aws:states:::dynamodb:updateItem",
+      "ResultPath": "$.updateResult",
+      "Type": "Task"
+    },
+    "Next state exists?": {
+      "Choices": [
+        {
+          "Comment": "Yes",
+          "IsPresent": true,
+          "Next": "Apply next state",
+          "Variable": "$.next.Item"
+        }
+      ],
+      "Default": "Mark deployment as failed",
+      "Type": "Choice"
+    },
+    "Set deployment id": {
+      "Next": "Increment currentIndex",
+      "Parameters": {
+        "ExpressionAttributeValues": {
+          ":deploymentId": {
+            "S.$": "$$.Execution.Name"
+          }
+        },
+        "Key": {
+          "microFrontendId": {
+            "S.$": "States.Format('{}',$.mfeId)"
+          },
+          "projectId": {
+            "S.$": "$.projectId"
+          }
+        },
+        "TableName.$": "$.mfeTable",
+        "UpdateExpression": "SET deploymentId = :deploymentId"
+      },
+      "Resource": "arn:aws:states:::dynamodb:updateItem",
+      "ResultPath": "$.updateResult",
+      "Type": "Task"
+    },
+    "Unset deployment id": {
+      "End": true,
+      "Parameters": {
+        "Key": {
+          "microFrontendId": {
+            "S.$": "States.Format('{}',$.mfeId)"
+          },
+          "projectId": {
+            "S.$": "$.projectId"
+          }
+        },
+        "TableName.$": "$.mfeTable",
+        "UpdateExpression": "REMOVE deploymentId"
+      },
+      "Resource": "arn:aws:states:::dynamodb:updateItem",
+      "Type": "Task"
+    },
+    "Update deployment record": {
+      "Next": "Done?",
+      "Parameters": {
+        "ExpressionAttributeValues": {
+          ":now": {
+            "S.$": "$$.State.EnteredTime"
+          },
+          ":state": {
+            "S.$": "States.Format('{}',$.position.currentIndex)"
+          }
+        },
+        "Key": {
+          "deploymentId": {
+            "S.$": "$$.Execution.Name"
+          },
+          "sk": {
+            "S": "detail"
+          }
+        },
+        "TableName.$": "$.deploymentTable",
+        "UpdateExpression": "SET currentState = :state, updatedAt = :now"
+      },
+      "Resource": "arn:aws:states:::dynamodb:updateItem",
+      "ResultPath": "$.updateResult",
+      "Type": "Task"
+    },
+    "Wait": {
+      "Next": "Increment currentIndex",
+      "SecondsPath": "$.waitSeconds",
+      "Type": "Wait"
+    }
+  }
+}

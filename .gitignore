@@ -1,0 +1,6 @@
+node_modules/
+.aws-sam/
+samconfig.toml
+.local
+coverage
+.envrc
