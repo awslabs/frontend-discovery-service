@@ -1,0 +1,28 @@
+{
+  "mfeName": "catalog",
+  "microFrontendId": "1fd2800e-2740-43e5-ad7e-5af54c91f12e",
+  "projectId": "dcc549d8-bd0c-49d2-bff8-f6fa80fb7856",
+  "projectName": "my-project",
+  "versions": [
+    {
+      "deployment": {
+        "default": true,
+        "traffic": 100
+      },
+      "fallbackUrl": "https://alt-cdn.com/my-account-2.0.0.js",
+      "metadata": {
+        "integrity": "e0d123e5f316bef78bfdf5a008837577",
+        "version": "2.0.0"
+      },
+      "url": "https://static.website.com/my-account-2.0.0.js"
+    },
+    {
+      "fallbackUrl": "https://alt-cdn.com/my-account-1.2.2.js",
+      "metadata": {
+        "integrity": "e0d123e5f316bef78bfdf5a008837580",
+        "version": "1.2.2"
+      },
+      "url": "https://static.website.com/my-account-1.2.2.js"
+    }
+  ]
+}
