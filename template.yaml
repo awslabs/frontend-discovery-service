@@ -150,7 +150,7 @@ Resources:
   StreamHandler:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: src/lambda/stream
+      CodeUri: infrastructure/lambda/stream
       Handler: app.handler
       Timeout: 60
       Environment:
@@ -203,7 +203,7 @@ Resources:
   ConsumerHandler:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: src/lambda/consumerApi
+      CodeUri: infrastructure/lambda/consumerApi
       Handler: app.handler
       Timeout: 10
       Environment:
@@ -288,7 +288,7 @@ Resources:
   CICDHandler:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: src/lambda/cicd
+      CodeUri: infrastructure/lambda/cicd
       Handler: app.handler
       Timeout: 10
       Environment:
@@ -436,7 +436,7 @@ Resources:
         Fn::Transform:
           Name: AWS::Include
           Parameters:
-            Location: src/stepfunctions/deploymentASL.json
+            Location: infrastructure/stepfunctions/deploymentASL.json
       RoleArn: !GetAtt StateMachineRole.Arn
 
 Outputs:
@@ -449,9 +449,12 @@ Outputs:
   CognitoUserPoolArn:
     Description: Cognito User Pool Arn
     Value: !GetAtt UserPool.Arn
-  CognitoUserPoolId:
+  CognitoUserPoolID:
     Description: Cognito User Pool Id
     Value: !Ref UserPool
-  CognitoUserPoolClientId:
+  CognitoWebClientID:
     Description: Cognito User Pool Client Id
     Value: !Ref UserPoolClient
+  Region:
+    Description: The AWS region where the infrastructure is deployed
+    Value: !Ref "AWS::Region"
