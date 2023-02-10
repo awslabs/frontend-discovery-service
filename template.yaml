@@ -68,6 +68,10 @@ Resources:
       TimeToLiveSpecification:
         AttributeName: "expiresAt"
         Enabled: true
+      SSESpecification:
+        KMSMasterKeyId: alias/aws/dynamodb
+        SSEEnabled: true
+        SSEType: KMS
 
   FrontendStore:
     Type: AWS::DynamoDB::Table
@@ -88,6 +92,10 @@ Resources:
       TimeToLiveSpecification:
         AttributeName: "expiresAt"
         Enabled: true
+      SSESpecification:
+        KMSMasterKeyId: alias/aws/dynamodb
+        SSEEnabled: true
+        SSEType: KMS
 
   ConsumerViewStore:
     Type: AWS::DynamoDB::Table
@@ -103,6 +111,10 @@ Resources:
           KeyType: "HASH"
         - AttributeName: "microFrontendId"
           KeyType: "RANGE"
+      SSESpecification:
+        KMSMasterKeyId: alias/aws/dynamodb
+        SSEEnabled: true
+        SSEType: KMS
 
   DeploymentStore:
     Type: AWS::DynamoDB::Table
@@ -121,6 +133,10 @@ Resources:
       TimeToLiveSpecification:
         AttributeName: "expiresAt"
         Enabled: true
+      SSESpecification:
+        KMSMasterKeyId: alias/aws/dynamodb
+        SSEEnabled: true
+        SSEType: KMS
 
   VersionStore:
     Type: AWS::DynamoDB::Table
@@ -139,6 +155,10 @@ Resources:
       TimeToLiveSpecification:
         AttributeName: "expiresAt"
         Enabled: true
+      SSESpecification:
+        KMSMasterKeyId: alias/aws/dynamodb
+        SSEEnabled: true
+        SSEType: KMS
 
   ConsumerApi:
     Type: AWS::Serverless::Api
