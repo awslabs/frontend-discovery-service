@@ -4,3 +4,4 @@ samconfig.toml
 .local
 coverage
 .envrc
+venv

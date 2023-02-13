@@ -1,4 +1,4 @@
-import { getStates, Strategy } from "../src/lambda/cicd/deployment";
+import { getStates } from "../infrastructure/lambda/cicd/deployment";
 
 const mfe = require("./stubs/mfe.json");
 

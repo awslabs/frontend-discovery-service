@@ -2,9 +2,9 @@ import { mockClient } from "aws-sdk-client-mock";
 import { DynamoDBDocumentClient, QueryCommand } from "@aws-sdk/lib-dynamodb";
 const ddbMock = mockClient(DynamoDBDocumentClient);
 
-import { getFrontends } from "../src/lambda/consumerApi/app";
-import determineMFE from "../src/lambda/consumerApi/determineMFE";
-jest.mock("../src/lambda/consumerApi/determineMFE");
+import { getFrontends } from "../infrastructure/lambda/consumerApi/app";
+import determineMFE from "../infrastructure/lambda/consumerApi/determineMFE";
+jest.mock("../infrastructure/lambda/consumerApi/determineMFE");
 
 process.env.CONSUMER_STORE = "consumer";
 
