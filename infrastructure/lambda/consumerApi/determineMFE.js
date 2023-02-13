@@ -1,4 +1,4 @@
-export default determineMFE = (mfe, user) => {
+const determineMFE = (mfe, user) => {
   const defaultVersion = mfe.versions.find((v) => v.deployment.default);
   try {
     // 1: Return singular
@@ -42,3 +42,5 @@ export const hashCode = (str) => {
   }
   return hash;
 };
+
+export default determineMFE;

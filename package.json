@@ -23,7 +23,7 @@
     "aws-sdk-client-mock": "^2.0.0",
     "aws-sdk-client-mock-jest": "^2.0.0",
     "babel-jest": "^29.2.2",
-    "jest": "^29.2.2",
+    "jest": "^29.4.2",
     "supertest": "^6.3.1",
     "toml": "^3.0.0"
   },

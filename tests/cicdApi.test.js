@@ -6,14 +6,9 @@ import {
   ScanCommand,
   PutCommand,
   BatchWriteCommand,
-  DeleteCommand,
   UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
-import {
-  SFNClient,
-  StartExecutionCommand,
-  StopExecutionCommand,
-} from "@aws-sdk/client-sfn";
+import { SFNClient, StartExecutionCommand } from "@aws-sdk/client-sfn";
 import { v4 as uuidv4 } from "uuid";
 
 jest.mock("uuid");
@@ -32,7 +27,7 @@ import {
   patchProjectApi,
   patchMFEApi,
   checkCanDeploy,
-} from "../src/lambda/cicd/app";
+} from "../infrastructure/lambda/cicd/app";
 
 const uuidStub = "81149c12-8c00-4ec2-9c03-cca5f1def455";
 process.env.FRONTEND_STORE = "frontend";
