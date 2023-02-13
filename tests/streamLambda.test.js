@@ -12,7 +12,7 @@ const ddbMock = mockClient(DynamoDBDocumentClient);
 import {
   handleUpdateProject,
   handleUpdateFrontend,
-} from "../src/lambda/stream/app";
+} from "../infrastructure/lambda/stream/app";
 
 process.env.FRONTEND_STORE = "frontend";
 process.env.PROJECT_STORE = "project";

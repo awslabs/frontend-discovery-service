@@ -66,10 +66,10 @@ beforeAll(async () => {
     (o) => o.OutputKey == "ConsumerApi"
   ).OutputValue;
   userPoolId = stack.Stacks[0].Outputs.find(
-    (o) => o.OutputKey == "CognitoUserPoolId"
+    (o) => o.OutputKey == "CognitoUserPoolID"
   ).OutputValue;
   const clientId = stack.Stacks[0].Outputs.find(
-    (o) => o.OutputKey == "CognitoUserPoolClientId"
+    (o) => o.OutputKey == "CognitoWebClientID"
   ).OutputValue;
 
   // create user

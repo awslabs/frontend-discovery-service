@@ -1,4 +1,6 @@
-import determineMFE, { hashCode } from "../src/lambda/consumerApi/determineMFE";
+import determineMFE, {
+  hashCode,
+} from "../infrastructure/lambda/consumerApi/determineMFE";
 import { v4 as uuidv4 } from "uuid";
 
 const view = require("./stubs/consumerView.json");
