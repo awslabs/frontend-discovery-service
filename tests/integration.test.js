@@ -128,6 +128,48 @@ afterAll(async () => {
   );
 });
 
+describe("unauthenticated requests", () => {
+  const endpoints = [
+    ["post", "/projects", { name: "my-project" }],
+    ["patch", "/projects/123456789asdfghjkl", { name: "my-project-123" }],
+    ["delete", "/projects/123456789asdfghjkl"],
+    ["get", "/projects"],
+    [
+      "post",
+      "/projects/123456789asdfghjkl/microFrontends",
+      { name: "catalog" },
+    ],
+    ["get", "/projects/123456789asdfghjkl/microFrontends"],
+    [
+      "patch",
+      "/projects/123456789asdfghjkl/microFrontends/123456789000",
+      { name: "catalog-123" },
+    ],
+    [
+      "post",
+      "/projects/123456789asdfghjkl/microFrontends/123456789000/versions",
+      { version: mfeVersion1 },
+    ],
+    [
+      "get",
+      "/projects/123456789asdfghjkl/microFrontends/123456789000/versions",
+    ],
+  ];
+
+  endpoints.forEach(([method, endpoint, payload]) => {
+    testIf(
+      runIntegrationTests,
+      `${method} ${endpoint} should return 401`,
+      async () => {
+        let req = request(cicdEndpoint)[method](endpoint);
+        if (method !== "get") req = req.send(payload);
+        const response = await req;
+        expect(response.statusCode).toBe(401);
+      }
+    );
+  });
+});
+
 describe("creating a project", () => {
   const projectName = "my-project";
   let response;
@@ -359,7 +401,7 @@ describe("patching an mfe active versions", () => {
     response = await request(cicdEndpoint)
       .patch(`/projects/${project.id}/microFrontends/${mfe.id}`)
       .set("Authorization", authToken)
-      .send({ activeVersions: activeVersions });
+      .send({ activeVersions });
   });
 
   testIf(runIntegrationTests, "should return 200", () => {
@@ -380,9 +422,9 @@ describe("getting an mfe as a consumer", () => {
 
   beforeAll(async () => {
     await new Promise((r) => setTimeout(r, 1000));
-    response = await request(consumerEndpoint)
-      .get(`/projects/${project.id}/microFrontends`)
-      .set("Authorization", authToken);
+    response = await request(consumerEndpoint).get(
+      `/projects/${project.id}/microFrontends`
+    );
   });
 
   testIf(runIntegrationTests, "should return 200", () => {
@@ -422,7 +464,6 @@ describe("getting an mfe as the same consumer", () => {
   beforeAll(async () => {
     response = await request(consumerEndpoint)
       .get(`/projects/${project.id}/microFrontends`)
-      .set("Authorization", authToken)
       .set("Cookie", [`USER_TOKEN=${userToken}`]);
   });
 
@@ -441,7 +482,6 @@ describe("getting an mfe as the same consumer", () => {
 describe("deleting a project", () => {
   let response;
   beforeAll(async () => {
-    // await new Promise((r) => setTimeout(r, 500));
     response = await request(cicdEndpoint)
       .delete(`/projects/${project.id}`)
       .set("Authorization", authToken);
