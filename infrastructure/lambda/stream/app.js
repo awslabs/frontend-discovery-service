@@ -133,6 +133,8 @@ export const handleUpdateFrontend = async (record) => {
   } else if (record.dynamodb.NewImage.deleted?.BOOL) {
     await handleDeleteFrontend(record);
     return;
+  } else if (record.dynamodb.NewImage.activeVersions.L.length === 0) {
+    return;
   }
 
   logger.debug("handleUpdateFrontend", record);
