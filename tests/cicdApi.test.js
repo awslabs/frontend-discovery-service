@@ -429,6 +429,60 @@ describe("CICD Api", () => {
     expect(result.statusCode).toBe(201);
   });
 
+  test("it posts a new frontend version with deployment", async () => {
+    uuidv4.mockReturnValueOnce(uuidStub);
+    ddbMock
+      .on(QueryCommand, {
+        KeyConditionExpression:
+          "projectId = :project And microFrontendId = :microFrontendId",
+        ExpressionAttributeValues: {
+          ":project": projectStub.projectId,
+          ":microFrontendId": mfeStub.microFrontendId,
+        },
+        TableName: process.env.FRONTEND_STORE,
+      })
+      .resolves({ Items: [mfeStub] });
+
+    const newVersion = {
+      fallbackUrl: "https://alt-cdn.com/my-account-3.0.0.js",
+      metadata: {
+        integrity: "e0d123e5f316bef78bfdf5a008837999",
+        version: "3.0.0",
+      },
+      url: "https://static.website.com/my-account-3.0.0.js",
+    };
+
+    const event = {
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        version: newVersion,
+        deploymentStrategy: "Canary10Percent5Minutes",
+      }),
+      pathParameters: {
+        projectId: projectStub.projectId,
+        microFrontendId: mfeStub.microFrontendId,
+      },
+    };
+    const result = await postFrontendVersionApi(event, {});
+    const body = JSON.parse(result.body);
+
+    expect(ddbMock).toHaveReceivedCommand(BatchWriteCommand);
+    expect(ddbMock).toHaveReceivedCommandWith(PutCommand, {
+      TableName: process.env.VERSION_STORE,
+      Item: {
+        microFrontendId: mfeStub.microFrontendId,
+        version: newVersion.metadata.version,
+        data: newVersion,
+      },
+    });
+    expect(body).toStrictEqual({
+      microFrontendId: mfeStub.microFrontendId,
+      version: newVersion,
+      deploymentId: uuidStub,
+    });
+    expect(result.statusCode).toBe(201);
+  });
+
   test("it throws if body is invalid when posting a frontend version", async () => {
     try {
       const event = {

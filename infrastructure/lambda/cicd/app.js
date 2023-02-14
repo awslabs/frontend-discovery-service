@@ -341,7 +341,7 @@ export const postFrontendVersionApi = middy()
       new PutCommand(getPutMicroFrontendVersionParams(microFrontendId, version))
     );
     if (deploymentStrategy) {
-      result.deploymentId = initiateDeployment(
+      result.deploymentId = await initiateDeployment(
         mfe,
         version.metadata.version,
         deploymentStrategy
@@ -418,8 +418,8 @@ export const deleteDeploymentApi = middy().handler(async (event, context) => {
     },
     UpdateExpression: "set activeVersions = :v, #def = :d",
     ExpressionAttributeValues: {
-      ":v": initState.activeVersions,
-      ":d": initState.default,
+      ":v": initState.state.activeVersions,
+      ":d": initState.state.default,
     },
     ExpressionAttributeNames: {
       "#def": "default",
@@ -625,6 +625,11 @@ export const getDeploymentById = async (deploymentId) => {
     TableName: process.env.DEPLOYMENT_STORE,
   };
   const result = await docClient.send(new QueryCommand(params));
+
+  if (result.Items.length == 0)
+    throw new createError.NotFound(
+      "The specified deployment could not be found."
+    );
 
   return result.Items;
 };

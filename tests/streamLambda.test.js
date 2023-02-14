@@ -175,7 +175,22 @@ describe("Stream lambda", () => {
           projectId: { S: viewStub.projectId },
           microFrontendId: { S: viewStub.microFrontendId },
         },
-        NewImage: {},
+        NewImage: {
+          activeVersions: {
+            L: [
+              {
+                M: {
+                  traffic: {
+                    N: "100",
+                  },
+                  version: {
+                    S: activeVersion.version,
+                  },
+                },
+              },
+            ],
+          },
+        },
       },
     };
 
