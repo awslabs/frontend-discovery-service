@@ -31,8 +31,7 @@ To deploy the solution manually from source to your AWS account, run the
 following commands:
 
 ```bash
-sam build
-sam deploy --guided
+npm run build
 export STACK_NAME = <STACK NAME>
 ```
 

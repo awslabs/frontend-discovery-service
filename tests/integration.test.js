@@ -16,7 +16,7 @@ const cognito = new CognitoIdentityProviderClient();
 const username = "aws-uk-sa-builders@amazon.com";
 const pwd = "!Acceptance1Tests2password!";
 let userPoolId;
-let cicdEndpoint;
+let adminApiEndpoint;
 let consumerEndpoint;
 let project = {};
 let mfe = {};
@@ -59,8 +59,8 @@ beforeAll(async () => {
     new DescribeStacksCommand({ StackName: process.env.STACK_NAME })
   );
 
-  cicdEndpoint = stack.Stacks[0].Outputs.find(
-    (o) => o.OutputKey == "CICDApi"
+  adminApiEndpoint = stack.Stacks[0].Outputs.find(
+    (o) => o.OutputKey == "AdminApi"
   ).OutputValue;
   consumerEndpoint = stack.Stacks[0].Outputs.find(
     (o) => o.OutputKey == "ConsumerApi"
@@ -161,7 +161,7 @@ describe("unauthenticated requests", () => {
       runIntegrationTests,
       `${method} ${endpoint} should return 401`,
       async () => {
-        let req = request(cicdEndpoint)[method](endpoint);
+        let req = request(adminApiEndpoint)[method](endpoint);
         if (method !== "get") req = req.send(payload);
         const response = await req;
         expect(response.statusCode).toBe(401);
@@ -174,7 +174,7 @@ describe("creating a project", () => {
   const projectName = "my-project";
   let response;
   beforeAll(async () => {
-    response = await request(cicdEndpoint)
+    response = await request(adminApiEndpoint)
       .post("/projects")
       .set("Authorization", authToken)
       .send({ name: projectName });
@@ -199,7 +199,7 @@ describe("renaming a project", () => {
   const newProjectName = "my-project-123";
   let response;
   beforeAll(async () => {
-    response = await request(cicdEndpoint)
+    response = await request(adminApiEndpoint)
       .patch(`/projects/${project.id}`)
       .set("Authorization", authToken)
       .send({ name: newProjectName });
@@ -224,7 +224,7 @@ describe("getting a list of projects", () => {
   let response;
 
   beforeAll(async () => {
-    response = await request(cicdEndpoint)
+    response = await request(adminApiEndpoint)
       .get(`/projects`)
       .set("Authorization", authToken);
   });
@@ -249,7 +249,7 @@ describe("creating a mfe", () => {
   const mfeName = "catalog";
   let response;
   beforeAll(async () => {
-    response = await request(cicdEndpoint)
+    response = await request(adminApiEndpoint)
       .post(`/projects/${project.id}/microFrontends`)
       .set("Authorization", authToken)
       .send({ name: mfeName });
@@ -275,7 +275,7 @@ describe("updating an mfe to change the name", () => {
   const newMfeName = "catalog-123";
   let response;
   beforeAll(async () => {
-    response = await request(cicdEndpoint)
+    response = await request(adminApiEndpoint)
       .patch(`/projects/${project.id}/microFrontends/${mfe.id}`)
       .set("Authorization", authToken)
       .send({ name: newMfeName });
@@ -299,7 +299,7 @@ describe("updating an mfe to change the name", () => {
 describe("posting a new version to an mfe", () => {
   let response;
   beforeAll(async () => {
-    response = await request(cicdEndpoint)
+    response = await request(adminApiEndpoint)
       .post(`/projects/${project.id}/microFrontends/${mfe.id}/versions`)
       .set("Authorization", authToken)
       .send({ version: mfeVersion1 });
@@ -318,7 +318,7 @@ describe("getting a list of frontends for a project", () => {
   let response;
 
   beforeAll(async () => {
-    response = await request(cicdEndpoint)
+    response = await request(adminApiEndpoint)
       .get(`/projects/${project.id}/microFrontends`)
       .set("Authorization", authToken);
   });
@@ -348,7 +348,7 @@ describe("getting a list of frontends for a project", () => {
 describe("posting another new version to an mfe", () => {
   let response;
   beforeAll(async () => {
-    response = await request(cicdEndpoint)
+    response = await request(adminApiEndpoint)
       .post(`/projects/${project.id}/microFrontends/${mfe.id}/versions`)
       .set("Authorization", authToken)
       .send({ version: mfeVersion2 });
@@ -367,7 +367,7 @@ describe("getting an mfe with versions", () => {
   let response;
 
   beforeAll(async () => {
-    response = await request(cicdEndpoint)
+    response = await request(adminApiEndpoint)
       .get(`/projects/${project.id}/microFrontends/${mfe.id}/versions`)
       .set("Authorization", authToken);
   });
@@ -398,7 +398,7 @@ describe("patching an mfe active versions", () => {
     { version: mfeVersion2.metadata.version, traffic: 50 },
   ];
   beforeAll(async () => {
-    response = await request(cicdEndpoint)
+    response = await request(adminApiEndpoint)
       .patch(`/projects/${project.id}/microFrontends/${mfe.id}`)
       .set("Authorization", authToken)
       .send({ activeVersions });
@@ -482,7 +482,7 @@ describe("getting an mfe as the same consumer", () => {
 describe("deleting a project", () => {
   let response;
   beforeAll(async () => {
-    response = await request(cicdEndpoint)
+    response = await request(adminApiEndpoint)
       .delete(`/projects/${project.id}`)
       .set("Authorization", authToken);
   });

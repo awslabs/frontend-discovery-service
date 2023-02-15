@@ -1,4 +1,4 @@
-import { getStates } from "../infrastructure/lambda/cicd/deployment";
+import { getStates } from "../infrastructure/lambda/adminApi/deployment";
 
 const mfe = require("./stubs/mfe.json");
 
