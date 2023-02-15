@@ -20,7 +20,7 @@ This section describes how to install, configure and use the Frontend Service Di
     - [Identify current solution version](#identify-current-solution-version)
     - [Identify the Stack URL to deploy](#identify-the-stack-url-to-deploy)
     - [Minor Upgrades: Perform CloudFormation Stack Update](#minor-upgrades-perform-cloudformation-stack-update)
-    - [Major Upgrades: Manual Rolling Deployment](#major-upgrades-manual-rolling-deployment)
+    - [Major Upgrades: New Deployment](#major-upgrades-new-deployment)
   - [Deleting the Solution](#deleting-the-solution)
 
 ## Deploying the Solution
@@ -271,34 +271,28 @@ To deploy via AWS Console:
 To deploy via the AWS CLI
 [consult the documentation](https://docs.aws.amazon.com/cli/latest/reference/cloudformation/update-stack.html).
 
-### Major Upgrades: Manual Rolling Deployment
+### Major Upgrades: New Deployment
 
-The process for a manual rolling deployment is as follows:
+The process for a major upgrade is as follows:
 
-1. Create a new stack from scratch
-2. Export the data from the old stack to the new stack
-3. Migrate consumers to new API and Web UI URLs
+1. Create a new stack from scratch.
+2. Export the data from the old stack to the new stack.
+3. Migrate users to the new API endpoints.
 4. Delete the old stack.
 
 The steps for performing this process are:
 
 1. Deploy a new instance of the Solution by following the instructions contained
    in the ["Deploying the Solution" section](#deploying-the-solution). Make sure
-   you use unique values for Stack Name and ResourcePrefix parameter which
-   differ from existing stack.
+   you use unique values for Stack Name parameter which differ from existing stack.
 2. Migrate Data from DynamoDB to ensure the new stack contains the necessary
-   configuration related to Data Mappers and settings. When both stacks are
-   deployed in the same account and region, the simplest way to migrate is via
-   [On-Demand Backup and Restore]. If the stacks are deployed in different
-   regions or accounts, you can use [AWS Data Pipeline].
-3. Ensure that all the bucket policies for the Data Mappers are in place for the
-   new stack. See the
-   ["Granting Access to Data" section](#granting-access-to-data) for steps to do
-   this.
+   configuration related to MicroFrontends. If your data set is small, it may be easiest to script the transfer of data.
+   Alternatively, you can use [S3 Export](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/S3DataExport.HowItWorks.html)
+   and then write a script solely for the import.
 4. Review the [Changelog] for changes that may affect how you use the new
-   deployment. This may require you to make changes to any software you have
-   that interacts with the solution's API.
-5. Once all the consumers are migrated to the new stack (API and Web UI), delete
+   deployment. This may require you to make changes to any software or libraries you have
+   that interacts with the APIs.
+5. Once all the Admin and Consumer Users are migrated to the new stack, delete
    the old stack.
 
 ## Deleting the Solution
