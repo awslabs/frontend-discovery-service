@@ -94,7 +94,7 @@ resources.
 8. Wait for the CloudFormation stack to launch. Completion is indicated when the
    "Stack status" is "_CREATE_COMPLETE_".
    - You can monitor the stack creation progress in the "Events" tab.
-9. Note the _AdminApi_ and _ConsumerApi_ values displayed in the _Outputs_ tab for the stack. These are used to access the application.
+9. Note the _AdminAPI_ and _ConsumerApi_ values displayed in the _Outputs_ tab for the stack. These are used to access the application.
 
 ## Accessing the application
 
@@ -120,7 +120,7 @@ Cognito User Pool.
 
 #### Cognito
 
-Note the _CognitoUserPoolID_, _CognitoWebClientID_ and _AdminApi_ parameters displayed in the _Outputs_ tab for the stack.
+Note the _CognitoUserPoolID_, _CognitoWebClientID_ and _AdminAPI_ parameters displayed in the _Outputs_ tab for the stack.
 
 If you provided a _DefaultUserEmail_ parameter when deploying the stack you will have been emailed a temporary password. Otherwise, you will need to create a user in the AWS Console. You will then need to use the temporary password to set a long term password.
 
