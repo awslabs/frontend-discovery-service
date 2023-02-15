@@ -191,7 +191,6 @@ In the case of any error in this process, the version marked `default` will be r
 
 The above functionality is implemented [here](../infrastructure/lambda/consumerApi/determineMFE.js) and can be customised as needed.
 
-
 #### Detailed Example
 
 1. Let's assume we have a Project called `MyWebsite` with ID `aa11` and a MicroFrontend called `Catalog` with ID `bb22` currently deployed with one active version: `1.0.0`.
