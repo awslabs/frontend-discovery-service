@@ -5,3 +5,4 @@ samconfig.toml
 coverage
 .envrc
 venv
+.DS_Store
