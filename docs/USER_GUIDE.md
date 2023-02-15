@@ -65,8 +65,7 @@ resources.
    - **Stack Name:** (Default: frontend-discovery-service) This is the name that is used to refer to this stack in CloudFormation once deployed.
      **AccessControlAllowOrigin**. The cors configuration for allow-origin for the consumer API. Specify a domain or * to allow all.
 
-   The following parameters are optional and allow further customisation of the
-   solution if required:
+   The following parameters are optional and allow further customisation of the solution if required:
 
    - **EnableDynamoDBBackups:** (Default: false) Whether to enable point in time recovery for the DynamoDB tables.
    - **Stage:** (Default: prod) The stage name used for both APIs.
