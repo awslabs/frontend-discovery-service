@@ -45,7 +45,7 @@ Parameters:
       - "ENFORCED"
 
   DeleteExpiryMinutes:
-    Description: The type of Cognito advanced security to enable. Disabled by default.
+    Description: The number of minutes deleted data will be retained.
     Type: Number
     Default: 1440
 
@@ -296,12 +296,17 @@ Resources:
       UserPoolId: !Ref UserPool
       SupportedIdentityProviders:
         - COGNITO
+      ExplicitAuthFlows:
+        - ALLOW_ADMIN_USER_PASSWORD_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
+        - ALLOW_USER_SRP_AUTH
+        - ALLOW_CUSTOM_AUTH
 
   CognitoUserPoolAdmin:
     Condition: CreateUser
     Type: AWS::Cognito::UserPoolUser
     Properties:
-      Username: admin
+      Username: !Ref DefaultUserEmail
       DesiredDeliveryMediums:
         - EMAIL
       UserPoolId: !Ref UserPool
