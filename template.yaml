@@ -52,6 +52,11 @@ Parameters:
 Conditions:
   CreateUser: !Not [!Equals [!Ref DefaultUserEmail, ""]]
 
+Mappings:
+  Solution:
+    Constants:
+      Version: 'v0.1'
+
 Resources:
   ProjectStore:
     Type: AWS::DynamoDB::Table
@@ -483,3 +488,5 @@ Outputs:
   Region:
     Description: The AWS region where the infrastructure is deployed
     Value: !Ref "AWS::Region"
+  SolutionVersion:
+    Value: !FindInMap [Solution, Constants, Version]
