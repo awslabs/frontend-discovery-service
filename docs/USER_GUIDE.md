@@ -68,6 +68,7 @@ resources.
    The following parameters are optional and allow further customisation of the
    solution if required:
 
+   - **EnableDynamoDBBackups:** (Default: false) Whether to enable point in time recovery for the DynamoDB tables.
    - **Stage:** (Default: prod) The stage name used for both APIs.
    - **LogLevel:** (Default: INFO) The log level for Lambda functions deployed for the solution.
    - **DefaultUserEmail:** Optional email for the default user for the ci/cd API. Leave blank to skip creation.
