@@ -19,7 +19,7 @@ learn about costs.
 
 ## Usage
 
-The solution provides a REST API to allow you to integrate it in your own CI/CD pipelines, a well as a REST API to allow you to integrate the schema to your front-end applications.
+The solution provides a REST Admin API to allow you to integrate it in your own CI/CD pipelines, a well as a REST Consumer API to allow you to integrate the solution with your front-end applications.
 
 See the [user guide](docs/USER_GUIDE.md) to learn how to use the solution and
 the [API specification](docs/API.md) to integrate the solution with your

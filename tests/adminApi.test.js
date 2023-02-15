@@ -27,7 +27,7 @@ import {
   patchProjectApi,
   patchMFEApi,
   checkCanDeploy,
-} from "../infrastructure/lambda/cicd/app";
+} from "../infrastructure/lambda/adminApi/app";
 
 const uuidStub = "81149c12-8c00-4ec2-9c03-cca5f1def455";
 process.env.FRONTEND_STORE = "frontend";
@@ -40,7 +40,7 @@ const mfeStub = require("./stubs/mfe.json");
 const mfeDeploymentStub = require("./stubs/mfeDeployment.json");
 const versionsStub = require("./stubs/versions.json");
 
-describe("CICD Api", () => {
+describe("Admin Api", () => {
   beforeEach(() => {
     ddbMock.reset();
   });
