@@ -13,7 +13,9 @@ This section describes how to install, configure and use the Frontend Service Di
       - [Cognito](#cognito)
     - [Integrating the solution with other applications using CloudFormation stack outputs](#integrating-the-solution-with-other-applications-using-cloudformation-stack-outputs)
   - [Customising the consumer response](#customising-the-consumer-response)
-    - [Consumer Stickyness](#consumer-stickyness)
+    - [Consumer Stickiness](#consumer-stickiness)
+    - [Determining the MicroFrontend for a Consumer](#determining-the-microfrontend-for-a-consumer)
+      - [Detailed Example](#detailed-example)
   - [Creating Deployments](#creating-deployments)
     - [How Deployments Work](#how-deployments-work)
   - [Updating the Solution](#updating-the-solution)
@@ -173,7 +175,7 @@ between importing exported values and using nested stacks.
 
 When a consumer requests a MicroFrontend by calling the Consumer API, a number of steps are taken to determine which version information to return. This can be broken down into two phases, both of which are detailed below and can be customised as required.
 
-### Consumer Stickyness
+### Consumer Stickiness
 
 Upon the first request of a Consumer, they are assigned an USER_ID which is returned to them as a `Set-Cookie` header, which should therefore persist across numerous requests.
 
@@ -188,6 +190,51 @@ Otherwise, the USER_ID as described above is combined with the current active ve
 In the case of any error in this process, the version marked `default` will be returned.
 
 The above functionality is implemented [here](../infrastructure/lambda/consumerApi/determineMFE.js) and can be customised as needed.
+
+
+#### Detailed Example
+
+1. Let's assume we have a Project called `MyWebsite` with ID `aa11` and a MicroFrontend called `Catalog` with ID `bb22` currently deployed with one active version: `1.0.0`.
+
+2. If two users with USER_ID `12345` and `23456` consume the Consumer API on Prod stage: `GET` `https://{consumerAPIUrl}/Prod/aa11/microFrontends` they will both receive a response for version `1.0.0` of `Catalog` similar to:
+
+```json
+    {
+        "schema": "https://mfewg.org/schema/v1-pre.json",
+        "microFrontends": {
+            "MyWebsite/Catalog": [
+                {
+                    "metadata": {
+                        "version": "1.0.0",
+                        "integrity": "e0d123e5f317bef78bfdf5a008837200"
+                    },
+                    "fallbackUrl": "https://alt-cdn.com/catalog-1.0.0.js",
+                    "url": "https://static.website.com/catalog-1.0.0.js"
+                }
+            ]
+        }
+    }
+```
+
+3. The Admin API is invoked to deploy version `2.0.0` of `Catalog` with a `Linear10PercentEvery1Minute` deployment strategy: `POST` `https://{adminAPIUrl}/Prod/aa11/microFrontends/bb22/versions` with appropriate `Authorization` header and request body:
+
+```json
+    {
+        "version": {
+            "url": "https://static.website.com/catalog-2.0.0.js",
+            "metadata": {
+                "version": "2.0.0",
+                "integrity": "e0d123e5f317bef78bfdf5a008837200"
+            },
+            "fallbackUrl": "https://alt-cdn.com/catalog-2.0.0.js"
+        },
+        "deploymentStrategy": "Linear10PercentEvery1Minute"
+    }
+```
+
+4. Immediately and for the next minute, 10% of the users will start seeing version `2.0.0` when making the request described in step 2, while 90% will keep seeing `1.0.0`. The platform will do its best to distribute traffic according to configuration, making sure stickiness is guaranteed, so that when user `12345`, at some point during the deployment, starts to see version `2.0.0`, they will keep seeing the same version for the rest of the deployment.
+
+5. After about 10 minutes, the deployment of version `2.0.0` will complete and all users will receive this version.
 
 ## Creating Deployments
 
