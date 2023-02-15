@@ -33,6 +33,7 @@
     }
   },
   "scripts": {
+    "deploy": "sam build && sam deploy --guided",
     "test": "jest"
   },
   "type": "module"

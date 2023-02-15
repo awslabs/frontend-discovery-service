@@ -33,7 +33,7 @@ Parameters:
   DefaultUserEmail:
     Type: String
     Default: ""
-    Description: Optional email for the default user for the ci/cd API. Leave blank to skip creation
+    Description: Optional email for the default user for the Admin API. Leave blank to skip creation
 
   CognitoAdvancedSecurity:
     Description: The type of Cognito advanced security to enable. Disabled by default.
@@ -48,6 +48,14 @@ Parameters:
     Description: The type of Cognito advanced security to enable. Disabled by default.
     Type: Number
     Default: 1440
+
+  EnableDynamoDBBackups:
+    Description: Whether to enable point in time recovery for the DynamoDB tables
+    Type: String
+    Default: "false"
+    AllowedValues:
+      - "true"
+      - "false"
 
 Conditions:
   CreateUser: !Not [!Equals [!Ref DefaultUserEmail, ""]]
@@ -72,6 +80,8 @@ Resources:
         KMSMasterKeyId: alias/aws/dynamodb
         SSEEnabled: true
         SSEType: KMS
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: !Ref EnableDynamoDBBackups
 
   FrontendStore:
     Type: AWS::DynamoDB::Table
@@ -96,6 +106,8 @@ Resources:
         KMSMasterKeyId: alias/aws/dynamodb
         SSEEnabled: true
         SSEType: KMS
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: !Ref EnableDynamoDBBackups
 
   ConsumerViewStore:
     Type: AWS::DynamoDB::Table
@@ -115,6 +127,8 @@ Resources:
         KMSMasterKeyId: alias/aws/dynamodb
         SSEEnabled: true
         SSEType: KMS
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: !Ref EnableDynamoDBBackups
 
   DeploymentStore:
     Type: AWS::DynamoDB::Table
@@ -137,6 +151,8 @@ Resources:
         KMSMasterKeyId: alias/aws/dynamodb
         SSEEnabled: true
         SSEType: KMS
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: !Ref EnableDynamoDBBackups
 
   VersionStore:
     Type: AWS::DynamoDB::Table
@@ -159,6 +175,8 @@ Resources:
         KMSMasterKeyId: alias/aws/dynamodb
         SSEEnabled: true
         SSEType: KMS
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: !Ref EnableDynamoDBBackups
 
   ConsumerApi:
     Type: AWS::Serverless::Api
@@ -293,7 +311,7 @@ Resources:
         - Name: email_verified
           Value: "True"
 
-  CICDAPI:
+  AdminAPI:
     Type: AWS::Serverless::Api
     Properties:
       StageName: !Ref Stage
@@ -305,10 +323,10 @@ Resources:
           Cognito:
             UserPoolArn: !GetAtt UserPool.Arn
 
-  CICDHandler:
+  AdminAPIHandler:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: infrastructure/lambda/cicd
+      CodeUri: infrastructure/lambda/adminApi
       Handler: app.handler
       Timeout: 10
       Environment:
@@ -316,7 +334,7 @@ Resources:
           LOG_LEVEL: !Ref LogLevel
           ACCOUNT_ID: !Ref "AWS::AccountId"
           REGION: !Ref "AWS::Region"
-          POWERTOOLS_SERVICE_NAME: cicdApi
+          POWERTOOLS_SERVICE_NAME: AdminAPI
           PROJECT_STORE: !Ref ProjectStore
           FRONTEND_STORE: !Ref FrontendStore
           DEPLOYMENT_STORE: !Ref DeploymentStore
@@ -351,73 +369,73 @@ Resources:
           Properties:
             Path: /projects
             Method: GET
-            RestApiId: !Ref CICDAPI
+            RestApiId: !Ref AdminAPI
         PostProjects:
           Type: Api
           Properties:
             Path: /projects
             Method: POST
-            RestApiId: !Ref CICDAPI
+            RestApiId: !Ref AdminAPI
         PatchProject:
           Type: Api
           Properties:
             Path: /projects/{projectId}
             Method: PATCH
-            RestApiId: !Ref CICDAPI
+            RestApiId: !Ref AdminAPI
         DeleteProject:
           Type: Api
           Properties:
             Path: /projects/{projectId}
             Method: DELETE
-            RestApiId: !Ref CICDAPI
+            RestApiId: !Ref AdminAPI
         DeleteMicroFrontend:
           Type: Api
           Properties:
             Path: /projects/{projectId}/microFrontends/{microFrontendId}
             Method: DELETE
-            RestApiId: !Ref CICDAPI
+            RestApiId: !Ref AdminAPI
         GetMicroFrontends:
           Type: Api
           Properties:
             Path: /projects/{projectId}/microFrontends
             Method: GET
-            RestApiId: !Ref CICDAPI
+            RestApiId: !Ref AdminAPI
         GetMicroFrontendVersions:
           Type: Api
           Properties:
             Path: /projects/{projectId}/microFrontends/{microFrontendId}/versions
             Method: GET
-            RestApiId: !Ref CICDAPI
+            RestApiId: !Ref AdminAPI
         PostMicroFrontends:
           Type: Api
           Properties:
             Path: /projects/{projectId}/microFrontends
             Method: POST
-            RestApiId: !Ref CICDAPI
+            RestApiId: !Ref AdminAPI
         PatchMicroFrontend:
           Type: Api
           Properties:
             Path: /projects/{projectId}/microFrontends/{microFrontendId}
             Method: PATCH
-            RestApiId: !Ref CICDAPI
+            RestApiId: !Ref AdminAPI
         PostMicroFrontendVersion:
           Type: Api
           Properties:
             Path: /projects/{projectId}/microFrontends/{microFrontendId}/versions
             Method: POST
-            RestApiId: !Ref CICDAPI
+            RestApiId: !Ref AdminAPI
         PostDeployment:
           Type: Api
           Properties:
             Path: /projects/{projectId}/microFrontends/{microFrontendId}/deployment
             Method: POST
-            RestApiId: !Ref CICDAPI
+            RestApiId: !Ref AdminAPI
         DeleteDeployment:
           Type: Api
           Properties:
             Path: /projects/{projectId}/microFrontends/{microFrontendId}/deployment/{deploymentId}
             Method: DELETE
-            RestApiId: !Ref CICDAPI
+            RestApiId: !Ref AdminAPI
     Metadata:
       BuildMethod: esbuild
       BuildProperties:
@@ -461,11 +479,11 @@ Resources:
 
 Outputs:
   ConsumerApi:
-    Description: "ConsumerApi API Gateway endpoint URL"
+    Description: "Consumer Api API Gateway endpoint URL"
     Value: !Sub "https://${ConsumerApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}"
-  CICDApi:
-    Description: "CI/CD API Gateway endpoint URL"
-    Value: !Sub "https://${CICDAPI}.execute-api.${AWS::Region}.amazonaws.com/${Stage}"
+  AdminApi:
+    Description: "Admin API Gateway endpoint URL"
+    Value: !Sub "https://${AdminAPI}.execute-api.${AWS::Region}.amazonaws.com/${Stage}"
   CognitoUserPoolArn:
     Description: Cognito User Pool Arn
     Value: !GetAtt UserPool.Arn

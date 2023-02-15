@@ -52,7 +52,7 @@ transferred out.
 
 ### Amazon Cognito
 
-Amazon Cognito provides authentication to secure access to the CI/CD API using an
+Amazon Cognito provides authentication to secure access to the Admin API using an
 administrative user created during deployment. You pay a monthly fee for active users in the Cognito User Pool.
 
 [Amazon Cognito Pricing]

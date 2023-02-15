@@ -2,14 +2,14 @@
 
 This solution contains two APIs:
 
-- CI/CD API - Used to manage releases for MicroFrontends. The API endpoints are authorized by Cognito.
+- Admin API - Used to manage releases for MicroFrontends. The API endpoints are authorized by Cognito.
 - Consumer API - Used to retrieve endpoints and metadata for MicroFrontends. The API has no authorizer configured.
 
-## CI/CD API
+## Admin API
 
-Listed below are the endpoints for this API. Requests must be signed with credentials retrieved from Cognito. Where the request takes a body, refer to the [JSON Schema](../infrastructure/lambda/cicd/inputSchemas.js) for more information.
+Listed below are the endpoints for this API. Requests must be signed with credentials retrieved from Cognito. Where the request takes a body, refer to the [JSON Schema](../infrastructure/lambda/adminApi/inputSchemas.js) for more information.
 
-The endpoint for this API can be retrieved from the CloudFormation output `CICDApi` after you have deployed the solution.
+The endpoint for this API can be retrieved from the CloudFormation output `AdminApi` after you have deployed the solution.
 
 ---
 ```GET	/projects```
@@ -201,7 +201,7 @@ Example Response:
 
 ```POST	/projects/{projectId}/microFrontends/{microFrontendId}/versions	```
 
-Adds a new version for a MicroFrontend. Optionally initiates a deployment if a strategy is specified. Available strategies are detailed in the [JSON Schema](../infrastructure/lambda/cicd/inputSchemas.js).
+Adds a new version for a MicroFrontend. Optionally initiates a deployment if a strategy is specified. Available strategies are detailed in the [JSON Schema](../infrastructure/lambda/adminApi/inputSchemas.js).
 
 Example Request:
 
@@ -240,7 +240,7 @@ Example Response:
 ---
 ```POST	/projects/{projectId}/microFrontends/{microFrontendId}/deployment	```
 
-Initiates a new deployment using the specified strategy. Available strategies are detailed in the [JSON Schema](../infrastructure/lambda/cicd/inputSchemas.js).
+Initiates a new deployment using the specified strategy. Available strategies are detailed in the [JSON Schema](../infrastructure/lambda/adminApi/inputSchemas.js).
 
 Example Request:
 
