@@ -10,12 +10,12 @@ This section describes how to install, configure and use the Frontend Service Di
   - [Accessing the application](#accessing-the-application)
     - [Managing Admin API users](#managing-admin-api-users)
     - [Making authenticated API requests](#making-authenticated-api-requests)
-      - [Cognito](#cognito)
+  - [Cognito](#cognito)
     - [Integrating the solution with other applications using CloudFormation stack outputs](#integrating-the-solution-with-other-applications-using-cloudformation-stack-outputs)
   - [Customising the consumer response](#customising-the-consumer-response)
     - [Consumer Stickiness](#consumer-stickiness)
     - [Determining the MicroFrontend for a Consumer](#determining-the-microfrontend-for-a-consumer)
-      - [Detailed Example](#detailed-example)
+  - [Detailed Example](#detailed-example)
   - [Creating Deployments](#creating-deployments)
     - [How Deployments Work](#how-deployments-work)
   - [Updating the Solution](#updating-the-solution)
@@ -44,18 +44,18 @@ resources.
    wish to [deploy using the AWS CLI] instead, you can refer to the "_Template
    Link_" to download the template files.
 
-| Region                                     | Launch Template                                                                                                                                                                                                                                   | Template Link                                                                                                                   | Launch IAM Role Template                                                                                                                                                                                                                           | IAM Role Template Link                                                                                                      |
-| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| **US East (N. Virginia)** (us-east-1)      | [Launch](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?frontend-discovery-service&templateURL=https://solution-builders-us-east-1.s3.us-east-1.amazonaws.com/frontend-discovery-service/latest/template.yaml)                | [Link](https://solution-builders-us-east-1.s3.us-east-1.amazonaws.com/frontend-discovery-service/latest/template.yaml)           | [Launch](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?frontend-discovery-service-Role&templateURL=https://solution-builders-us-east-1.s3.us-east-1.amazonaws.com/frontend-discovery-service/latest/role.yaml)                | [Link](https://solution-builders-us-east-1.s3.us-east-1.amazonaws.com/frontend-discovery-service/latest/role.yaml)           |
-| **US East (Ohio)** (us-east-2)             | [Launch](https://console.aws.amazon.com/cloudformation/home?region=us-east-2#/stacks/new?frontend-discovery-service&templateURL=https://solution-builders-us-east-2.s3.us-east-2.amazonaws.com/frontend-discovery-service/latest/template.yaml)                | [Link](https://solution-builders-us-east-2.s3.us-east-2.amazonaws.com/frontend-discovery-service/latest/template.yaml)           | [Launch](https://console.aws.amazon.com/cloudformation/home?region=us-east-2#/stacks/new?frontend-discovery-service-Role&templateURL=https://solution-builders-us-east-2.s3.us-east-2.amazonaws.com/frontend-discovery-service/latest/role.yaml)                | [Link](https://solution-builders-us-east-2.s3.us-east-2.amazonaws.com/frontend-discovery-service/latest/role.yaml)           |
-| **US West (Oregon)** (us-west-2)           | [Launch](https://console.aws.amazon.com/cloudformation/home?region=us-west-2#/stacks/new?frontend-discovery-service&templateURL=https://solution-builders-us-west-2.s3.us-west-2.amazonaws.com/frontend-discovery-service/latest/template.yaml)                | [Link](https://solution-builders-us-west-2.s3.us-west-2.amazonaws.com/frontend-discovery-service/latest/template.yaml)           | [Launch](https://console.aws.amazon.com/cloudformation/home?region=us-west-2#/stacks/new?frontend-discovery-service-Role&templateURL=https://solution-builders-us-west-2.s3.us-west-2.amazonaws.com/frontend-discovery-service/latest/role.yaml)                | [Link](https://solution-builders-us-west-2.s3.us-west-2.amazonaws.com/frontend-discovery-service/latest/role.yaml)           |
-| **Asia Pacific (Mumbai)** (ap-south-1)     | [Launch](https://console.aws.amazon.com/cloudformation/home?region=ap-south-1#/stacks/new?frontend-discovery-service&templateURL=https://solution-builders-ap-south-1.s3.ap-south-1.amazonaws.com/frontend-discovery-service/latest/template.yaml)             | [Link](https://solution-builders-ap-south-1.s3.ap-south-1.amazonaws.com/frontend-discovery-service/latest/template.yaml)         | [Launch](https://console.aws.amazon.com/cloudformation/home?region=ap-south-1#/stacks/new?frontend-discovery-service-Role&templateURL=https://solution-builders-ap-south-1.s3.ap-south-1.amazonaws.com/frontend-discovery-service/latest/role.yaml)             | [Link](https://solution-builders-ap-south-1.s3.ap-south-1.amazonaws.com/frontend-discovery-service/latest/role.yaml)         |
-| **Asia Pacific (Sydney)** (ap-southeast-2) | [Launch](https://console.aws.amazon.com/cloudformation/home?region=ap-southeast-2#/stacks/new?frontend-discovery-service&templateURL=https://solution-builders-ap-southeast-2.s3.ap-southeast-2.amazonaws.com/frontend-discovery-service/latest/template.yaml) | [Link](https://solution-builders-ap-southeast-2.s3.ap-southeast-2.amazonaws.com/frontend-discovery-service/latest/template.yaml) | [Launch](https://console.aws.amazon.com/cloudformation/home?region=ap-southeast-2#/stacks/new?frontend-discovery-service-Role&templateURL=https://solution-builders-ap-southeast-2.s3.ap-southeast-2.amazonaws.com/frontend-discovery-service/latest/role.yaml) | [Link](https://solution-builders-ap-southeast-2.s3.ap-southeast-2.amazonaws.com/frontend-discovery-service/latest/role.yaml) |
-| **Asia Pacific (Tokyo)** (ap-northeast-1)  | [Launch](https://console.aws.amazon.com/cloudformation/home?region=ap-northeast-1#/stacks/new?frontend-discovery-service&templateURL=https://solution-builders-ap-northeast-1.s3.ap-northeast-1.amazonaws.com/frontend-discovery-service/latest/template.yaml) | [Link](https://solution-builders-ap-northeast-1.s3.ap-northeast-1.amazonaws.com/frontend-discovery-service/latest/template.yaml) | [Launch](https://console.aws.amazon.com/cloudformation/home?region=ap-northeast-1#/stacks/new?frontend-discovery-service-Role&templateURL=https://solution-builders-ap-northeast-1.s3.ap-northeast-1.amazonaws.com/frontend-discovery-service/latest/role.yaml) | [Link](https://solution-builders-ap-northeast-1.s3.ap-northeast-1.amazonaws.com/frontend-discovery-service/latest/role.yaml) |
-| **EU (Ireland)** (eu-west-1)               | [Launch](https://console.aws.amazon.com/cloudformation/home?region=eu-west-1#/stacks/new?frontend-discovery-service&templateURL=https://solution-builders-eu-west-1.s3.eu-west-1.amazonaws.com/frontend-discovery-service/latest/template.yaml)                | [Link](https://solution-builders-eu-west-1.s3.eu-west-1.amazonaws.com/frontend-discovery-service/latest/template.yaml)           | [Launch](https://console.aws.amazon.com/cloudformation/home?region=eu-west-1#/stacks/new?frontend-discovery-service-Role&templateURL=https://solution-builders-eu-west-1.s3.eu-west-1.amazonaws.com/frontend-discovery-service/latest/role.yaml)                | [Link](https://solution-builders-eu-west-1.s3.eu-west-1.amazonaws.com/frontend-discovery-service/latest/role.yaml)           |
-| **EU (London)** (eu-west-2)                | [Launch](https://console.aws.amazon.com/cloudformation/home?region=eu-west-2#/stacks/new?frontend-discovery-service&templateURL=https://solution-builders-eu-west-2.s3.eu-west-2.amazonaws.com/frontend-discovery-service/latest/template.yaml)                | [Link](https://solution-builders-eu-west-2.s3.eu-west-2.amazonaws.com/frontend-discovery-service/latest/template.yaml)           | [Launch](https://console.aws.amazon.com/cloudformation/home?region=eu-west-2#/stacks/new?frontend-discovery-service-Role&templateURL=https://solution-builders-eu-west-2.s3.eu-west-2.amazonaws.com/frontend-discovery-service/latest/role.yaml)                | [Link](https://solution-builders-eu-west-2.s3.eu-west-2.amazonaws.com/frontend-discovery-service/latest/role.yaml)           |
-| **EU (Frankfurt)** (eu-central-1)          | [Launch](https://console.aws.amazon.com/cloudformation/home?region=eu-central-1#/stacks/new?frontend-discovery-service&templateURL=https://solution-builders-eu-central-1.s3.eu-central-1.amazonaws.com/frontend-discovery-service/latest/template.yaml)       | [Link](https://solution-builders-eu-central-1.s3.eu-central-1.amazonaws.com/frontend-discovery-service/latest/template.yaml)     | [Launch](https://console.aws.amazon.com/cloudformation/home?region=eu-central-1#/stacks/new?frontend-discovery-service-Role&templateURL=https://solution-builders-eu-central-1.s3.eu-central-1.amazonaws.com/frontend-discovery-service/latest/role.yaml)       | [Link](https://solution-builders-eu-central-1.s3.eu-central-1.amazonaws.com/frontend-discovery-service/latest/role.yaml)     |
-| **EU (Stockholm)** (eu-north-1)            | [Launch](https://console.aws.amazon.com/cloudformation/home?region=eu-north-1#/stacks/new?frontend-discovery-service&templateURL=https://solution-builders-eu-north-1.s3.eu-north-1.amazonaws.com/frontend-discovery-service/latest/template.yaml)             | [Link](https://solution-builders-eu-north-1.s3.eu-north-1.amazonaws.com/frontend-discovery-service/latest/template.yaml)         | [Launch](https://console.aws.amazon.com/cloudformation/home?region=eu-north-1#/stacks/new?frontend-discovery-service-Role&templateURL=https://solution-builders-eu-north-1.s3.eu-north-1.amazonaws.com/frontend-discovery-service/latest/role.yaml)             | [Link](https://solution-builders-eu-north-1.s3.eu-north-1.amazonaws.com/frontend-discovery-service/latest/role.yaml)         |
+| Region | Launch Template | Template Link |
+| --- | --- | ---|
+| **US East (N. Virginia)** (us-east-1)  | [Launch](https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?frontend-discovery-service&templateURL=https://solution-builders-us-east-1.s3.us-east-1.amazonaws.com/frontend-discovery-service/latest/template.yaml) | [Link](https://solution-builders-us-east-1.s3.us-east-1.amazonaws.com/frontend-discovery-service/latest/template.yaml) |
+| **US East (Ohio)** (us-east-2) | [Launch](https://console.aws.amazon.com/cloudformation/home?region=us-east-2#/stacks/new?frontend-discovery-service&templateURL=https://solution-builders-us-east-2.s3.us-east-2.amazonaws.com/frontend-discovery-service/latest/template.yaml) | [Link](https://solution-builders-us-east-2.s3.us-east-2.amazonaws.com/frontend-discovery-service/latest/template.yaml) |
+| **US West (Oregon)** (us-west-2) | [Launch](https://console.aws.amazon.com/cloudformation/home?region=us-west-2#/stacks/new?frontend-discovery-service&templateURL=https://solution-builders-us-west-2.s3.us-west-2.amazonaws.com/frontend-discovery-service/latest/template.yaml) | [Link](https://solution-builders-us-west-2.s3.us-west-2.amazonaws.com/frontend-discovery-service/latest/template.yaml) |
+| **Asia Pacific (Mumbai)** (ap-south-1) | [Launch](https://console.aws.amazon.com/cloudformation/home?region=ap-south-1#/stacks/new?frontend-discovery-service&templateURL=https://solution-builders-ap-south-1.s3.ap-south-1.amazonaws.com/frontend-discovery-service/latest/template.yaml) | [Link](https://solution-builders-ap-south-1.s3.ap-south-1.amazonaws.com/frontend-discovery-service/latest/template.yaml)  |
+| **Asia Pacific (Sydney)** (ap-southeast-2) | [Launch](https://console.aws.amazon.com/cloudformation/home?region=ap-southeast-2#/stacks/new?frontend-discovery-service&templateURL=https://solution-builders-ap-southeast-2.s3.ap-southeast-2.amazonaws.com/frontend-discovery-service/latest/template.yaml) | [Link](https://solution-builders-ap-southeast-2.s3.ap-southeast-2.amazonaws.com/frontend-discovery-service/latest/template.yaml) |
+| **Asia Pacific (Tokyo)** (ap-northeast-1)  | [Launch](https://console.aws.amazon.com/cloudformation/home?region=ap-northeast-1#/stacks/new?frontend-discovery-service&templateURL=https://solution-builders-ap-northeast-1.s3.ap-northeast-1.amazonaws.com/frontend-discovery-service/latest/template.yaml) | [Link](https://solution-builders-ap-northeast-1.s3.ap-northeast-1.amazonaws.com/frontend-discovery-service/latest/template.yaml) |
+| **EU (Ireland)** (eu-west-1) | [Launch](https://console.aws.amazon.com/cloudformation/home?region=eu-west-1#/stacks/new?frontend-discovery-service&templateURL=https://solution-builders-eu-west-1.s3.eu-west-1.amazonaws.com/frontend-discovery-service/latest/template.yaml) | [Link](https://solution-builders-eu-west-1.s3.eu-west-1.amazonaws.com/frontend-discovery-service/latest/template.yaml) |
+| **EU (London)** (eu-west-2) | [Launch](https://console.aws.amazon.com/cloudformation/home?region=eu-west-2#/stacks/new?frontend-discovery-service&templateURL=https://solution-builders-eu-west-2.s3.eu-west-2.amazonaws.com/frontend-discovery-service/latest/template.yaml) | [Link](https://solution-builders-eu-west-2.s3.eu-west-2.amazonaws.com/frontend-discovery-service/latest/template.yaml) |
+| **EU (Frankfurt)** (eu-central-1) | [Launch](https://console.aws.amazon.com/cloudformation/home?region=eu-central-1#/stacks/new?frontend-discovery-service&templateURL=https://solution-builders-eu-central-1.s3.eu-central-1.amazonaws.com/frontend-discovery-service/latest/template.yaml)   | [Link](https://solution-builders-eu-central-1.s3.eu-central-1.amazonaws.com/frontend-discovery-service/latest/template.yaml)     |
+| **EU (Stockholm)** (eu-north-1)| [Launch](https://console.aws.amazon.com/cloudformation/home?region=eu-north-1#/stacks/new?frontend-discovery-service&templateURL=https://solution-builders-eu-north-1.s3.eu-north-1.amazonaws.com/frontend-discovery-service/latest/template.yaml) | [Link](https://solution-builders-eu-north-1.s3.eu-north-1.amazonaws.com/frontend-discovery-service/latest/template.yaml) |
 
 2. If prompted, login using your AWS account credentials.
 3. You should see a screen titled "_Create Stack_" at the "_Specify template_"
@@ -136,11 +136,11 @@ You will receive a challenge response requiring you to update your password. Sen
 
 ```sh
     aws cognito-idp admin-respond-to-auth-challenge \
-        --user-pool-id $COGNITO_USER_POOL_ID \
-        --client-id $COGNITO_USER_POOL_CLIENT_ID \
-        --challenge-name NEW_PASSWORD_REQUIRED \
-        --session $SESSION \
-        --challenge-responses USERNAME=$USER_EMAIL_ADDRESS,NEW_PASSWORD=$USER_PASSWORD
+    --user-pool-id $COGNITO_USER_POOL_ID \
+    --client-id $COGNITO_USER_POOL_CLIENT_ID \
+    --challenge-name NEW_PASSWORD_REQUIRED \
+    --session $SESSION \
+    --challenge-responses USERNAME=$USER_EMAIL_ADDRESS,NEW_PASSWORD=$USER_PASSWORD
 ```
 
 You will receive an authentication response. For future sessions you can authenticate with the first command above.
@@ -198,37 +198,37 @@ The above functionality is implemented [here](../infrastructure/lambda/consumerA
 2. If two users with USER_ID `12345` and `23456` consume the Consumer API on Prod stage: `GET` `https://{consumerAPIUrl}/Prod/aa11/microFrontends` they will both receive a response for version `1.0.0` of `Catalog` similar to:
 
 ```json
-    {
-        "schema": "https://mfewg.org/schema/v1-pre.json",
-        "microFrontends": {
-            "MyWebsite/Catalog": [
-                {
-                    "metadata": {
-                        "version": "1.0.0",
-                        "integrity": "e0d123e5f317bef78bfdf5a008837200"
-                    },
-                    "fallbackUrl": "https://alt-cdn.com/catalog-1.0.0.js",
-                    "url": "https://static.website.com/catalog-1.0.0.js"
-                }
-            ]
-        }
+{
+    "schema": "https://mfewg.org/schema/v1-pre.json",
+    "microFrontends": {
+        "MyWebsite/Catalog": [
+            {
+                "metadata": {
+                    "version": "1.0.0",
+                    "integrity": "e0d123e5f317bef78bfdf5a008837200"
+                },
+                "fallbackUrl": "https://alt-cdn.com/catalog-1.0.0.js",
+                "url": "https://static.website.com/catalog-1.0.0.js"
+            }
+        ]
     }
+}
 ```
 
 3. The Admin API is invoked to deploy version `2.0.0` of `Catalog` with a `Linear10PercentEvery1Minute` deployment strategy: `POST` `https://{adminAPIUrl}/Prod/aa11/microFrontends/bb22/versions` with appropriate `Authorization` header and request body:
 
 ```json
-    {
-        "version": {
-            "url": "https://static.website.com/catalog-2.0.0.js",
-            "metadata": {
-                "version": "2.0.0",
-                "integrity": "e0d123e5f317bef78bfdf5a008837200"
-            },
-            "fallbackUrl": "https://alt-cdn.com/catalog-2.0.0.js"
+{
+    "version": {
+        "url": "https://static.website.com/catalog-2.0.0.js",
+        "metadata": {
+            "version": "2.0.0",
+            "integrity": "e0d123e5f317bef78bfdf5a008837200"
         },
-        "deploymentStrategy": "Linear10PercentEvery1Minute"
-    }
+        "fallbackUrl": "https://alt-cdn.com/catalog-2.0.0.js"
+    },
+    "deploymentStrategy": "Linear10PercentEvery1Minute"
+}
 ```
 
 4. Immediately and for the next minute, 10% of the users will start seeing version `2.0.0` when making the request described in step 2, while 90% will keep seeing `1.0.0`. The platform will do its best to distribute traffic according to configuration, making sure stickiness is guaranteed, so that when user `12345`, at some point during the deployment, starts to see version `2.0.0`, they will keep seeing the same version for the rest of the deployment.
