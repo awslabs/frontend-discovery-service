@@ -63,7 +63,7 @@ Conditions:
 Mappings:
   Solution:
     Constants:
-      Version: 'v0.1'
+      Version: '0.1'
 
 Resources:
   ProjectStore:
