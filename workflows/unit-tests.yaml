@@ -1,0 +1,51 @@
+---
+
+name: Unit Tests
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types:
+      - opened
+      - edited
+      - synchronize
+jobs:
+  unit_tests:
+    name: Unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      # Cache
+      - uses: actions/cache@v1
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      # Setup
+      - name: Set up Python 3.9
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.9
+      - name: Set up Nodejs 16
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16
+      - name: Set up ruby 2.6
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '2.6'
+      - name: Set up SAM
+        uses: aws-actions/setup-sam@v2
+      - name: Install dependencies
+        run: |
+          npm install
+          gem install cfn-nag
+      # Run Tests
+      - name: CloudFormation unit tests
+        run: cfn_nag template.yaml
+      - name: Frontend unit tests
+        run: npm test
+      - name: SAM Validation and linting
+        run: sam build --validate
