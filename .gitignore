@@ -5,4 +5,5 @@ samconfig.toml
 coverage
 .envrc
 venv
+template-flipped.yaml
 .DS_Store
