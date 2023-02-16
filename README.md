@@ -12,7 +12,7 @@ The frontend discovery pattern improves the development experience when developi
 ## Installation
 
 The solution is available as an AWS CloudFormation template and should take
-about 10 minutes to deploy. See the
+about 5 minutes to deploy. See the
 [deployment guide](docs/USER_GUIDE.md#deploying-the-solution) for one-click
 deployment instructions, and the [cost overview guide](docs/COST_OVERVIEW.md) to
 learn about costs.
