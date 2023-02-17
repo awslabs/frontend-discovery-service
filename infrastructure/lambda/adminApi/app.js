@@ -89,6 +89,8 @@ export const postProjectsApi = middy()
     );
     const result = { id: projectId, name: projectName };
 
+    auditLog(event, { method: "CreateProject", projectId: projectId });
+
     return {
       statusCode: 201,
       body: JSON.stringify(result),
@@ -108,6 +110,8 @@ export const patchProjectApi = middy()
       new PutCommand(getPutProjectParams(projectId, newProjectName))
     );
     const result = { id: projectId, name: newProjectName };
+
+    auditLog(event, { method: "UpdateProject", projectId: projectId });
 
     return {
       statusCode: 200,
@@ -191,6 +195,8 @@ export const deleteProjectApi = middy().handler(async (event, context) => {
   };
   await docClient.send(new UpdateCommand(deleteParams));
 
+  auditLog(event, { method: "DeleteProject", projectId: projectId });
+
   return {
     statusCode: 202,
   };
@@ -218,6 +224,12 @@ export const deleteMicroFrontendApi = middy().handler(
     };
     await docClient.send(new UpdateCommand(deleteParams));
 
+    auditLog(event, {
+      method: "DeleteMicroFrontend",
+      projectId: projectId,
+      microFrontendId: microFrontendId,
+    });
+
     return {
       statusCode: 202,
     };
@@ -240,6 +252,12 @@ export const postMFEApi = middy()
       )
     );
     const result = { microFrontendId: microFrontendId, name: name };
+
+    auditLog(event, {
+      method: "CreateMicroFrontend",
+      projectId: projectId,
+      microFrontendId: microFrontendId,
+    });
 
     return {
       statusCode: 201,
@@ -311,6 +329,12 @@ export const patchMFEApi = middy()
       default: defaultVersion,
     };
 
+    auditLog(event, {
+      method: "UpdateMicroFrontend",
+      projectId: projectId,
+      microFrontendId: microFrontendId,
+    });
+
     return {
       statusCode: 200,
       body: JSON.stringify(result),
@@ -367,6 +391,13 @@ export const postFrontendVersionApi = middy()
       await docClient.send(new UpdateCommand(mfeParams));
     }
 
+    auditLog(event, {
+      method: "CreateVersion",
+      projectId: projectId,
+      microFrontendId: microFrontendId,
+      version: version.metadata.version,
+    });
+
     return {
       statusCode: 201,
       body: JSON.stringify(result),
@@ -389,6 +420,13 @@ export const postDeploymentApi = middy()
       targetVersion,
       deploymentStrategy
     );
+
+    auditLog(event, {
+      method: "CreateDeployment",
+      projectId: projectId,
+      microFrontendId: microFrontendId,
+      deploymentId: deploymentId,
+    });
 
     return {
       statusCode: 201,
@@ -440,6 +478,13 @@ export const deleteDeploymentApi = middy().handler(async (event, context) => {
     },
   };
   await docClient.send(new UpdateCommand(deploymentParams));
+
+  auditLog(event, {
+    method: "DeleteDeployment",
+    projectId: projectId,
+    microFrontendId: microFrontendId,
+    deploymentId: deploymentId,
+  });
 
   return {
     statusCode: 204,
@@ -668,6 +713,23 @@ export const getVersion = async (microFrontendId, version) => {
   if (result.Items.length == 0)
     throw new createError.NotFound("The specified version could not be found.");
   return result.Items[0];
+};
+
+export const getUserInfo = (event) => {
+  return {
+    user:
+      event.requestContext?.authorizer?.claims["cognito:username"] ?? "Unknown",
+    ip_address: event.requestContext?.identity?.sourceIp ?? "Unknown",
+  };
+};
+
+const auditLog = (event, logData) => {
+  logger.info({
+    audit: {
+      ...getUserInfo(event),
+      ...logData,
+    },
+  });
 };
 
 const routes = [
