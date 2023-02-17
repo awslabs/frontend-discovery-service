@@ -18,6 +18,7 @@ This section describes how to install, configure and use the Frontend Service Di
   - [Detailed Example](#detailed-example)
   - [Creating Deployments](#creating-deployments)
     - [How Deployments Work](#how-deployments-work)
+  - [Audit Logs](#audit-logs)
   - [Updating the Solution](#updating-the-solution)
     - [Identify current solution version](#identify-current-solution-version)
     - [Identify the Stack URL to deploy](#identify-the-stack-url-to-deploy)
@@ -253,6 +254,16 @@ When a deployment is initiated, the following steps occur:
 3. A Step Functions State Machine execution is initiated, the flow of which is detailed below. In short, it applies the calculated states to the MicroFrontend DynamoDB table until the deployment is complete. When the deployment is completed, the `default` property will be updated to the new version.
 
 ![Deployment Flow](images/deploymentflow.png)
+
+## Audit Logs
+
+Usage of the Admin API generates audit logs. These are emitted to CloudWatch Logs under an `audit` key. The logs are structured and can therefore be queried using CloudWatch Log Insights. Refer to the below example query as a starting point.
+
+```
+filter ispresent(audit.method)
+| fields @timestamp, @logStream, audit.method, audit.user, audit.ip_address, audit.projectId, audit.microFrontendId, audit.version, audit.deploymentId
+| sort @timestamp desc
+```
 
 ## Updating the Solution
 
