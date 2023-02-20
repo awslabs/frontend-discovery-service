@@ -59,10 +59,12 @@ export const getProjectsApi = middy().handler(async (event, context) => {
   const dynamoData = await docClient.send(new ScanCommand(params));
   const result = {
     projects: dynamoData.Items.map((p) => {
-      return {
+      let resultItem = {
         id: p.projectId,
         name: p.name,
       };
+      if (p.deleted) resultItem.deleted = p.deleted;
+      return resultItem;
     }),
   };
 
@@ -106,6 +108,9 @@ export const patchProjectApi = middy()
     const projectId = event.pathParameters.projectId;
     const newProjectName = event.body.name;
 
+    const project = await getProjectById(projectId);
+    if (project.deleted) throw new createError.NotFound();
+
     await docClient.send(
       new PutCommand(getPutProjectParams(projectId, newProjectName))
     );
@@ -135,7 +140,12 @@ export const getFrontendsApi = middy().handler(async (event, context) => {
     result.nextToken = mfeList.LastEvaluatedKey.microFrontendId;
 
   result.microFrontends = mfeList.Items.map((mfe) => {
-    return { name: `${project.name}/${mfe.name}`, id: mfe.microFrontendId };
+    let resultItem = {
+      name: `${project.name}/${mfe.name}`,
+      id: mfe.microFrontendId,
+    };
+    if (mfe.deleted) resultItem.deleted = mfe.deleted;
+    return resultItem;
   });
 
   return {
@@ -274,6 +284,8 @@ export const patchMFEApi = middy()
     const { projectId, microFrontendId } = event.pathParameters;
     const mfe = await getFrontendById(projectId, microFrontendId);
 
+    if (mfe.deleted) throw new createError.NotFound();
+
     let activeVersions = mfe.activeVersions ?? [];
     if (event.body.activeVersions) {
       if (mfe.deploymentId)
@@ -353,6 +365,8 @@ export const postFrontendVersionApi = middy()
     const result = { microFrontendId: microFrontendId, version: version };
     const mfe = await getFrontendById(projectId, microFrontendId);
 
+    if (mfe.deleted) throw new createError.NotFound();
+
     if (deploymentStrategy) {
       await checkCanDeploy(mfe, null, false);
       if (mfe.activeVersions?.length > 1)
@@ -413,6 +427,8 @@ export const postDeploymentApi = middy()
     const { projectId, microFrontendId } = event.pathParameters;
     const { targetVersion, deploymentStrategy } = event.body;
     const mfe = await getFrontendById(projectId, microFrontendId);
+
+    if (mfe.deleted) throw new createError.NotFound();
 
     await checkCanDeploy(mfe, targetVersion);
     const deploymentId = await initiateDeployment(

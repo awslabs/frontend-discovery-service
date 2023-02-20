@@ -66,6 +66,28 @@ describe("Admin Api", () => {
     expect(result.statusCode).toBe(200);
   });
 
+  test("it gets a list of projects and indicates deleted projects", async () => {
+    ddbMock
+      .on(ScanCommand, {
+        TableName: process.env.PROJECT_STORE,
+      })
+      .resolves({ Items: [{ ...projectStub, ...{ deleted: true } }] });
+
+    const result = await getProjectsApi({}, {});
+    const body = JSON.parse(result.body);
+
+    expect(body).toStrictEqual({
+      projects: [
+        {
+          id: projectStub.projectId,
+          name: projectStub.name,
+          deleted: true,
+        },
+      ],
+    });
+    expect(result.statusCode).toBe(200);
+  });
+
   test("it creates a new project", async () => {
     uuidv4.mockReturnValueOnce(uuidStub);
 
@@ -102,6 +124,16 @@ describe("Admin Api", () => {
   });
 
   test("it renames an existing project", async () => {
+    ddbMock
+      .on(QueryCommand, {
+        KeyConditionExpression: "projectId = :project",
+        ExpressionAttributeValues: {
+          ":project": projectStub.projectId,
+        },
+        TableName: process.env.PROJECT_STORE,
+      })
+      .resolves({ Items: [projectStub] });
+
     const newProjectName = "renamed-projct";
     const event = {
       headers: { "Content-Type": "application/json" },
@@ -123,6 +155,31 @@ describe("Admin Api", () => {
       name: newProjectName,
     });
     expect(result.statusCode).toBe(200);
+  });
+
+  test("it throws when patching a project that is deleted", async () => {
+    try {
+      ddbMock
+        .on(QueryCommand, {
+          KeyConditionExpression: "projectId = :project",
+          ExpressionAttributeValues: {
+            ":project": projectStub.projectId,
+          },
+          TableName: process.env.PROJECT_STORE,
+        })
+        .resolves({ Items: [{ ...projectStub, ...{ deleted: true } }] });
+
+      const event = {
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: "a name" }),
+        pathParameters: { projectId: projectStub.projectId },
+      };
+
+      await patchProjectApi(event, {});
+      fail("it should not reach here");
+    } catch (error) {
+      expect(error.statusCode).toBe(404);
+    }
   });
 
   test("it throws if body is invalid when renaming a project", async () => {
@@ -170,6 +227,44 @@ describe("Admin Api", () => {
         {
           name: `${projectStub.name}/${mfeStub.name}`,
           id: mfeStub.microFrontendId,
+        },
+      ],
+    });
+    expect(result.statusCode).toBe(200);
+  });
+
+  test("it gets project frontends and indicates deleted entries", async () => {
+    ddbMock
+      .on(QueryCommand, {
+        KeyConditionExpression: "projectId = :project",
+        ExpressionAttributeValues: {
+          ":project": projectStub.projectId,
+        },
+        TableName: process.env.PROJECT_STORE,
+      })
+      .resolves({ Items: [projectStub] })
+      .on(QueryCommand, {
+        KeyConditionExpression: "projectId = :project",
+        ExpressionAttributeValues: {
+          ":project": projectStub.projectId,
+        },
+        TableName: process.env.FRONTEND_STORE,
+      })
+      .resolves({ Items: [{ ...mfeStub, ...{ deleted: true } }] });
+
+    const event = {
+      pathParameters: { projectId: projectStub.projectId },
+    };
+    const result = await getFrontendsApi(event, {});
+    const body = JSON.parse(result.body);
+
+    expect(body).toStrictEqual({
+      projectId: projectStub.projectId,
+      microFrontends: [
+        {
+          name: `${projectStub.name}/${mfeStub.name}`,
+          id: mfeStub.microFrontendId,
+          deleted: true,
         },
       ],
     });
@@ -348,6 +443,36 @@ describe("Admin Api", () => {
     expect(result.statusCode).toBe(200);
   });
 
+  test("it throws when patching a microfrontend that is deleted", async () => {
+    try {
+      ddbMock
+        .on(QueryCommand, {
+          KeyConditionExpression:
+            "projectId = :project And microFrontendId = :microFrontendId",
+          ExpressionAttributeValues: {
+            ":project": projectStub.projectId,
+            ":microFrontendId": mfeStub.microFrontendId,
+          },
+          TableName: process.env.FRONTEND_STORE,
+        })
+        .resolves({ Items: [{ ...mfeStub, ...{ deleted: true } }] });
+
+      const event = {
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: "a name" }),
+        pathParameters: {
+          projectId: projectStub.projectId,
+          microFrontendId: mfeStub.microFrontendId,
+        },
+      };
+
+      const result = await patchMFEApi(event, {});
+      fail("it should not reach here");
+    } catch (error) {
+      expect(error.statusCode).toBe(404);
+    }
+  });
+
   test("it throws if specified default not in active versions when patching an mfe", async () => {
     try {
       const event = {
@@ -481,6 +606,46 @@ describe("Admin Api", () => {
       deploymentId: uuidStub,
     });
     expect(result.statusCode).toBe(201);
+  });
+
+  test("it throws if a microfrontend is deleted when posting a version", async () => {
+    try {
+      ddbMock
+        .on(QueryCommand, {
+          KeyConditionExpression:
+            "projectId = :project And microFrontendId = :microFrontendId",
+          ExpressionAttributeValues: {
+            ":project": projectStub.projectId,
+            ":microFrontendId": mfeStub.microFrontendId,
+          },
+          TableName: process.env.FRONTEND_STORE,
+        })
+        .resolves({ Items: [{ ...mfeStub, ...{ deleted: true } }] });
+
+      const newVersion = {
+        fallbackUrl: "https://alt-cdn.com/my-account-3.0.0.js",
+        metadata: {
+          integrity: "e0d123e5f316bef78bfdf5a008837999",
+          version: "3.0.0",
+        },
+        url: "https://static.website.com/my-account-3.0.0.js",
+      };
+
+      const event = {
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          version: newVersion,
+        }),
+        pathParameters: {
+          projectId: projectStub.projectId,
+          microFrontendId: mfeStub.microFrontendId,
+        },
+      };
+      const result = await postFrontendVersionApi(event, {});
+      fail("it should not reach here");
+    } catch (error) {
+      expect(error.statusCode).toBe(404);
+    }
   });
 
   test("it throws if body is invalid when posting a frontend version", async () => {
@@ -646,6 +811,39 @@ describe("Admin Api", () => {
     } catch (error) {
       expect(error.message).toBe("Event object failed validation");
       expect(error.statusCode).toBe(400);
+    }
+  });
+
+  test("it throws if the microfrontend is deleted when posting a deployment", async () => {
+    try {
+      const targetVersion = "2.0.0";
+      ddbMock
+        .on(QueryCommand, {
+          KeyConditionExpression:
+            "projectId = :project And microFrontendId = :microFrontendId",
+          ExpressionAttributeValues: {
+            ":project": projectStub.projectId,
+            ":microFrontendId": mfeStub.microFrontendId,
+          },
+          TableName: process.env.FRONTEND_STORE,
+        })
+        .resolves({ Items: [{ ...mfeStub, ...{ deleted: true } }] });
+
+      const event = {
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          targetVersion: targetVersion,
+          deploymentStrategy: "Linear10PercentEvery1Minute",
+        }),
+        pathParameters: {
+          projectId: projectStub.projectId,
+          microFrontendId: mfeStub.microFrontendId,
+        },
+      };
+      await postDeploymentApi(event, {});
+      fail("it should not reach here");
+    } catch (error) {
+      expect(error.statusCode).toBe(404);
     }
   });
 
