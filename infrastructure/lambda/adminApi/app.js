@@ -30,7 +30,6 @@ import createError from "http-errors";
 
 import inputSchemas from "./inputSchemas";
 import { getStates, Strategy } from "./deployment";
-import { OperationResultFilterName } from "@aws-sdk/client-cloudformation";
 
 const metrics = new Metrics();
 const logger = new Logger();
