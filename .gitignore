@@ -7,3 +7,4 @@ coverage
 venv
 template-flipped.yaml
 .DS_Store
+dist

@@ -36,6 +36,7 @@ own applications. See the [examples](examples) to see some examples on how to in
 - [Cost Overview](docs/COST_OVERVIEW.md)
 - [API Specification](docs/API.md)
 - [Local Development](docs/LOCAL_DEVELOPMENT.md)
+- [Examples](examples/README.md)
 
 ## Contributing
 

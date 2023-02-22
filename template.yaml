@@ -44,6 +44,11 @@ Parameters:
       - "AUDIT"
       - "ENFORCED"
 
+  CookieSettings:
+    Description: Settings to be applied when setting cookies via Set-Cookie header
+    Type: String
+    Default: Secure
+
   DeleteExpiryMinutes:
     Description: The number of minutes deleted data will be retained.
     Type: Number
@@ -256,6 +261,7 @@ Resources:
           POWERTOOLS_SERVICE_NAME: consumerApi
           CONSUMER_STORE: !Ref ConsumerViewStore
           ALLOW_ORIGIN: !Ref AccessControlAllowOrigin
+          COOKIE_SETTINGS: !Ref CookieSettings
       Policies:
         - DynamoDBReadPolicy:
             TableName: !Ref ConsumerViewStore

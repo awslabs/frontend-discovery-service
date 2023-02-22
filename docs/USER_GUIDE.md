@@ -66,7 +66,8 @@ resources.
    following parameters of the CloudFormation stack:
 
    - **Stack Name:** (Default: frontend-discovery-service) This is the name that is used to refer to this stack in CloudFormation once deployed.
-     **AccessControlAllowOrigin**. The cors configuration for allow-origin for the consumer API. Specify a domain or * to allow all.
+   - **AccessControlAllowOrigin:** The cors configuration for allow-origin for the consumer API. Specify a domain or `*` to allow all.
+   - **CookieSettings:** Suffix to be applied by Consumer API when producing the `Set-Cookie` header in case of user not recognized, in order to guarantee stickiness during deployments. Default value is `Secure`. For example, if the new user token will be `example123`, the header will be: `Set-Cookie: USER_TOKEN=example123; Secure`.
 
    The following parameters are optional and allow further customisation of the solution if required:
 
@@ -178,7 +179,9 @@ When a consumer requests a MicroFrontend by calling the Consumer API, a number o
 
 ### Consumer Stickiness
 
-Upon the first request of a Consumer, they are assigned an USER_ID which is returned to them as a `Set-Cookie` header, which should therefore persist across numerous requests.
+Upon the first request of a Consumer, if a `USER_TOKEN` cookie doesn't exist already, the response is returned to them with a `Set-Cookie` header, which will therefore persist across numerous requests.
+
+If you will need to work cross-domain, you will need to use `Secure; Same-Site=None` as `CookieSettings` when deploying the solution, as well as specifying the Frontend's origin as `AccessControlAllowOrigin` parameter in order for the cookie setting not to break CORS rules and be correctly persisted.
 
 The above functionality is implemented as a middleware using [middy](https://middy.js.org/docs/). You can easily write your own middleware if you wish to. Refer to the default code [here](../infrastructure/lambda/consumerApi/userTrackingHandler.js).
 
