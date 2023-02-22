@@ -27,6 +27,7 @@ import {
   patchProjectApi,
   patchMFEApi,
   checkCanDeploy,
+  deleteMicroFrontendApi,
 } from "../infrastructure/lambda/adminApi/app";
 
 const uuidStub = "81149c12-8c00-4ec2-9c03-cca5f1def455";
@@ -362,12 +363,41 @@ describe("Admin Api", () => {
     const result = await deleteProjectApi(event, {});
 
     expect(ddbMock).toHaveReceivedCommandWith(UpdateCommand, {
-      ExpressionAttributeValues: { ":d": true, ":e": expect.any(Number) },
+      ExpressionAttributeValues: {
+        ":d": true,
+        ":e": expect.any(Number),
+        ":p": projectStub.projectId,
+      },
       Key: { projectId: projectStub.projectId },
       TableName: process.env.PROJECT_STORE,
       UpdateExpression: "set deleted = :d, expiresAt = :e",
+      ConditionExpression: "projectId = :p",
     });
     expect(result.statusCode).toBe(202);
+  });
+
+  test("it throws if deleting a non existent project", async () => {
+    const event = {
+      pathParameters: { projectId: projectStub.projectId },
+    };
+    ddbMock
+      .on(UpdateCommand)
+      .rejectsOnce({ name: "ConditionalCheckFailedException" });
+
+    const result = await deleteProjectApi(event, {});
+
+    expect(ddbMock).toHaveReceivedCommandWith(UpdateCommand, {
+      ExpressionAttributeValues: {
+        ":d": true,
+        ":e": expect.any(Number),
+        ":p": projectStub.projectId,
+      },
+      Key: { projectId: projectStub.projectId },
+      TableName: process.env.PROJECT_STORE,
+      UpdateExpression: "set deleted = :d, expiresAt = :e",
+      ConditionExpression: "projectId = :p",
+    });
+    expect(result.statusCode).toBe(404);
   });
 
   test("it creates a new frontend", async () => {
@@ -395,6 +425,64 @@ describe("Admin Api", () => {
       name: mfeStub.name,
     });
     expect(result.statusCode).toBe(201);
+  });
+
+  test("it deletes a frontend", async () => {
+    const event = {
+      pathParameters: {
+        projectId: projectStub.projectId,
+        microFrontendId: mfeStub.microFrontendId,
+      },
+    };
+    const result = await deleteMicroFrontendApi(event, {});
+
+    expect(ddbMock).toHaveReceivedCommandWith(UpdateCommand, {
+      ExpressionAttributeValues: {
+        ":d": true,
+        ":e": expect.any(Number),
+        ":p": projectStub.projectId,
+        ":m": mfeStub.microFrontendId,
+      },
+      Key: {
+        projectId: projectStub.projectId,
+        microFrontendId: mfeStub.microFrontendId,
+      },
+      TableName: process.env.FRONTEND_STORE,
+      UpdateExpression: "set deleted = :d, expiresAt = :e",
+      ConditionExpression: "projectId = :p and microFrontendId = :m",
+    });
+    expect(result.statusCode).toBe(202);
+  });
+
+  test("it throws if deleting a non existent frontend", async () => {
+    const event = {
+      pathParameters: {
+        projectId: projectStub.projectId,
+        microFrontendId: mfeStub.microFrontendId,
+      },
+    };
+    ddbMock
+      .on(UpdateCommand)
+      .rejectsOnce({ name: "ConditionalCheckFailedException" });
+
+    const result = await deleteMicroFrontendApi(event, {});
+
+    expect(ddbMock).toHaveReceivedCommandWith(UpdateCommand, {
+      ExpressionAttributeValues: {
+        ":d": true,
+        ":e": expect.any(Number),
+        ":p": projectStub.projectId,
+        ":m": mfeStub.microFrontendId,
+      },
+      Key: {
+        projectId: projectStub.projectId,
+        microFrontendId: mfeStub.microFrontendId,
+      },
+      TableName: process.env.FRONTEND_STORE,
+      UpdateExpression: "set deleted = :d, expiresAt = :e",
+      ConditionExpression: "projectId = :p and microFrontendId = :m",
+    });
+    expect(result.statusCode).toBe(404);
   });
 
   test("it updates an existing frontend", async () => {

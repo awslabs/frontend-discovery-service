@@ -493,3 +493,29 @@ describe("deleting a project", () => {
     expect(response.statusCode).toBe(202);
   });
 });
+
+describe("deleting a non existent project", () => {
+  let response;
+  beforeAll(async () => {
+    response = await request(adminApiEndpoint)
+      .delete(`/projects/not-found`)
+      .set("Authorization", authToken);
+  });
+
+  testIf(runIntegrationTests, "should return 404", () => {
+    expect(response.statusCode).toBe(404);
+  });
+});
+
+describe("deleting a non existent frontend", () => {
+  let response;
+  beforeAll(async () => {
+    response = await request(adminApiEndpoint)
+      .delete(`/projects/not-found/microFrontends/not-found`)
+      .set("Authorization", authToken);
+  });
+
+  testIf(runIntegrationTests, "should return 404", () => {
+    expect(response.statusCode).toBe(404);
+  });
+});
