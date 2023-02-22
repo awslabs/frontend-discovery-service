@@ -43,7 +43,7 @@ export const getFrontends = middy().handler(async (event, context) => {
 
   mfeList.Items.forEach((mfe) => {
     if (!mfe.versions) return;
-    let mfeResult = determineMFE(mfe, userId);
+    let mfeResult = determineMFE(event, logger, mfe, userId);
     delete mfeResult.deployment;
     result.microFrontends[`${mfe.projectName}/${mfe.mfeName}`] = [mfeResult];
   });

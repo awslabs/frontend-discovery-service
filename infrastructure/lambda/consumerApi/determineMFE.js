@@ -1,7 +1,6 @@
-const determineMFE = (mfe, user) => {
+const determineMFE = (event, logger, mfe, user) => {
   const defaultVersion = mfe.versions.find((v) => v.deployment.default);
   try {
-    // 1: Return singular
     if (mfe.versions.length === 1) return mfe.versions[0];
 
     const versionString = mfe.versions.reduce(
@@ -25,7 +24,18 @@ const determineMFE = (mfe, user) => {
     if (deploymentVersion) return deploymentVersion;
 
     return defaultVersion;
-  } catch {
+  } catch (e) {
+    logger.error({
+      audit: {
+        user,
+        ipAddress: event.requestContext?.identity?.sourceIp ?? "Unknown",
+        method: "GetProjectFrontends",
+        projectId: mfe.projectId,
+        microFrontendId: mfe.microFrontendId,
+        statusCode: 200,
+      },
+    });
+    logger.error(e);
     return defaultVersion;
   }
 };

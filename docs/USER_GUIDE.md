@@ -264,7 +264,7 @@ Usage of the Admin API generates audit logs. These are emitted to CloudWatch Log
 
 ```
 filter ispresent(audit.method)
-| fields @timestamp, @logStream, audit.method, audit.user, audit.ip_address, audit.projectId, audit.microFrontendId, audit.version, audit.deploymentId
+| fields @timestamp, @logStream, audit.method, audit.user, audit.ipAddress, audit.projectId, audit.microFrontendId, audit.version, audit.deploymentId, audit.statusCode
 | sort @timestamp desc
 ```
 
