@@ -86,7 +86,6 @@ const routes = [
 export const handler = middy()
   .use(httpErrorHandler())
   .handler(httpRouterHandler(routes))
-  .use(cors({ origin: process.env.ALLOW_ORIGIN }))
-  .use(captureLambdaHandler(tracer))
+  .use(cors({ credentials: true, origin: process.env.ALLOW_ORIGIN }))
   .use(injectLambdaContext(logger))
-  .use(userTrackingHandler());
+  .use(userTrackingHandler(process.env.COOKIE_SETTINGS));

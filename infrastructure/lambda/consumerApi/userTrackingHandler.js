@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from "uuid";
 
-const userTrackingHandler = () => {
+const userTrackingHandler = (cookieSettings) => {
   return {
     before: async (request) => {
       const event = request.event;
@@ -12,13 +12,19 @@ const userTrackingHandler = () => {
         if (cookieName == "USER_TOKEN") userId = value;
       });
 
+      event.createUserCookie = !userId;
       event.userId = userId || uuidv4();
     },
     after: async (request) => {
-      request.response.headers = request.response.headers || {};
-      request.response.headers[
-        "Set-Cookie"
-      ] = `USER_TOKEN=${request.event.userId}`;
+      const event = request.event;
+      if (event.createUserCookie) {
+        request.response.headers = request.response.headers || {};
+        let newCookie = `USER_TOKEN=${event.userId}`;
+        if (cookieSettings.trim() !== "") {
+          newCookie += `; ${cookieSettings}`;
+        }
+        request.response.headers["Set-Cookie"] = newCookie;
+      }
     },
   };
 };
