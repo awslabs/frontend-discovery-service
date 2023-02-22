@@ -432,7 +432,9 @@ describe("getting an mfe as a consumer", () => {
   });
 
   testIf(runIntegrationTests, "should return the schema", () => {
-    expect(response.body.schema).toBe("https://mfewg.org/schema/v1-pre.json");
+    expect(response.body.schema).toBe(
+      "https://raw.githubusercontent.com/awslabs/frontend-discovery/main/schema/v1-pre.json"
+    );
   });
 
   testIf(

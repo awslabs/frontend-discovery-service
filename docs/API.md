@@ -282,7 +282,7 @@ Example Response:
 
 ```json
 {
-    "schema": "https://mfewg.org/schema/v1-pre.json",
+    "schema": "https://raw.githubusercontent.com/awslabs/frontend-discovery/main/schema/v1-pre.json",
     "microFrontends": {
         "my-project-123/catalog-123": [
             {

@@ -200,7 +200,7 @@ The above functionality is implemented [here](../infrastructure/lambda/consumerA
 
 ```json
 {
-    "schema": "https://mfewg.org/schema/v1-pre.json",
+    "schema": "https://raw.githubusercontent.com/awslabs/frontend-discovery/main/schema/v1-pre.json",
     "microFrontends": {
         "MyWebsite/Catalog": [
             {
