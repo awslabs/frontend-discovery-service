@@ -26,7 +26,8 @@ const docClient = DynamoDBDocumentClient.from(dynamoClient);
 export const getFrontends = middy().handler(async (event, context) => {
   logger.debug(event);
   let result = {
-    schema: "https://mfewg.org/schema/v1-pre.json",
+    schema:
+      "https://raw.githubusercontent.com/awslabs/frontend-discovery/main/schema/v1-pre.json",
     microFrontends: {},
   };
 
