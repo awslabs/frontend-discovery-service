@@ -40,7 +40,8 @@ describe("AWS API Calls", () => {
     const body = JSON.parse(result.body);
 
     expect(body).toStrictEqual({
-      schema: "https://mfewg.org/schema/v1-pre.json",
+      schema:
+        "https://raw.githubusercontent.com/awslabs/frontend-discovery/main/schema/v1-pre.json",
       microFrontends: {
         [`${view.projectName}/${view.mfeName}`]: [
           view.versions[returnVersionIndex],
