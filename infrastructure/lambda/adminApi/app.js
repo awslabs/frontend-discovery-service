@@ -6,8 +6,6 @@ import {
   PutCommand,
   BatchWriteCommand,
   UpdateCommand,
-  DeleteCommand,
-  paginateQuery,
 } from "@aws-sdk/lib-dynamodb";
 import {
   SFNClient,
@@ -91,7 +89,7 @@ export const postProjectsApi = middy()
     );
     const result = { id: projectId, name: projectName };
 
-    auditLog(event, { method: "CreateProject", projectId: projectId });
+    auditLog(event, { method: "CreateProject", projectId, statusCode: 201 });
 
     return {
       statusCode: 201,
@@ -116,7 +114,7 @@ export const patchProjectApi = middy()
     );
     const result = { id: projectId, name: newProjectName };
 
-    auditLog(event, { method: "UpdateProject", projectId: projectId });
+    auditLog(event, { method: "UpdateProject", projectId, statusCode: 200 });
 
     return {
       statusCode: 200,
@@ -194,22 +192,26 @@ export const deleteProjectApi = middy().handler(async (event, context) => {
   const recordExpiry = now + expirySeconds;
   const deleteParams = {
     TableName: process.env.PROJECT_STORE,
-    Key: {
-      projectId: projectId,
-    },
+    Key: { projectId },
     UpdateExpression: "set deleted = :d, expiresAt = :e",
     ExpressionAttributeValues: {
       ":d": true,
       ":e": recordExpiry,
+      ":p": projectId,
     },
+    ConditionExpression: "projectId = :p",
   };
-  await docClient.send(new UpdateCommand(deleteParams));
 
-  auditLog(event, { method: "DeleteProject", projectId: projectId });
+  let statusCode = 202;
 
-  return {
-    statusCode: 202,
-  };
+  try {
+    await docClient.send(new UpdateCommand(deleteParams));
+  } catch (error) {
+    statusCode = error.name === "ConditionalCheckFailedException" ? 404 : 500;
+  }
+
+  auditLog(event, { method: "DeleteProject", projectId, statusCode });
+  return { statusCode };
 });
 
 export const deleteMicroFrontendApi = middy().handler(
@@ -222,27 +224,33 @@ export const deleteMicroFrontendApi = middy().handler(
     const recordExpiry = now + expirySeconds;
     const deleteParams = {
       TableName: process.env.FRONTEND_STORE,
-      Key: {
-        projectId: projectId,
-        microFrontendId: microFrontendId,
-      },
+      Key: { projectId, microFrontendId },
       UpdateExpression: "set deleted = :d, expiresAt = :e",
       ExpressionAttributeValues: {
         ":d": true,
         ":e": recordExpiry,
+        ":p": projectId,
+        ":m": microFrontendId,
       },
+      ConditionExpression: "projectId = :p and microFrontendId = :m",
     };
-    await docClient.send(new UpdateCommand(deleteParams));
+
+    let statusCode = 202;
+
+    try {
+      await docClient.send(new UpdateCommand(deleteParams));
+    } catch (error) {
+      statusCode = error.name === "ConditionalCheckFailedException" ? 404 : 500;
+    }
 
     auditLog(event, {
       method: "DeleteMicroFrontend",
-      projectId: projectId,
-      microFrontendId: microFrontendId,
+      projectId,
+      microFrontendId,
+      statusCode,
     });
 
-    return {
-      statusCode: 202,
-    };
+    return { statusCode };
   }
 );
 
@@ -261,12 +269,13 @@ export const postMFEApi = middy()
         getPutMicroFrontendParams(projectId, microFrontendId, name)
       )
     );
-    const result = { microFrontendId: microFrontendId, name: name };
+    const result = { microFrontendId, name };
 
     auditLog(event, {
       method: "CreateMicroFrontend",
-      projectId: projectId,
-      microFrontendId: microFrontendId,
+      projectId,
+      microFrontendId,
+      statusCode: 201,
     });
 
     return {
@@ -343,8 +352,9 @@ export const patchMFEApi = middy()
 
     auditLog(event, {
       method: "UpdateMicroFrontend",
-      projectId: projectId,
-      microFrontendId: microFrontendId,
+      projectId,
+      microFrontendId,
+      statusCode: 200,
     });
 
     return {
@@ -407,9 +417,10 @@ export const postFrontendVersionApi = middy()
 
     auditLog(event, {
       method: "CreateVersion",
-      projectId: projectId,
-      microFrontendId: microFrontendId,
+      projectId,
+      microFrontendId,
       version: version.metadata.version,
+      statusCode: 201,
     });
 
     return {
@@ -439,9 +450,10 @@ export const postDeploymentApi = middy()
 
     auditLog(event, {
       method: "CreateDeployment",
-      projectId: projectId,
-      microFrontendId: microFrontendId,
-      deploymentId: deploymentId,
+      projectId,
+      microFrontendId,
+      deploymentId,
+      statusCode: 201,
     });
 
     return {
@@ -453,8 +465,21 @@ export const postDeploymentApi = middy()
 export const deleteDeploymentApi = middy().handler(async (event, context) => {
   logger.debug(event.pathParameters);
   const { projectId, microFrontendId, deploymentId } = event.pathParameters;
+  let deploymentItems;
 
-  const deploymentItems = await getDeploymentById(deploymentId);
+  try {
+    deploymentItems = await getDeploymentById(deploymentId);
+  } catch (error) {
+    auditLog(event, {
+      method: "DeleteDeployment",
+      projectId,
+      microFrontendId,
+      deploymentId,
+      statusCode: 404,
+    });
+    return { statusCode: 404 };
+  }
+
   const initState = deploymentItems.find((i) => i.sk === "state#0");
 
   await sfnClient.send(
@@ -497,14 +522,13 @@ export const deleteDeploymentApi = middy().handler(async (event, context) => {
 
   auditLog(event, {
     method: "DeleteDeployment",
-    projectId: projectId,
-    microFrontendId: microFrontendId,
-    deploymentId: deploymentId,
+    projectId,
+    microFrontendId,
+    deploymentId,
+    statusCode: 204,
   });
 
-  return {
-    statusCode: 204,
-  };
+  return { statusCode: 204 };
 });
 
 export const checkCanDeploy = async (
@@ -735,16 +759,13 @@ export const getUserInfo = (event) => {
   return {
     user:
       event.requestContext?.authorizer?.claims["cognito:username"] ?? "Unknown",
-    ip_address: event.requestContext?.identity?.sourceIp ?? "Unknown",
+    ipAddress: event.requestContext?.identity?.sourceIp ?? "Unknown",
   };
 };
 
 const auditLog = (event, logData) => {
-  logger.info({
-    audit: {
-      ...getUserInfo(event),
-      ...logData,
-    },
+  logger[logData.statusCode < 400 ? "info" : "error"]({
+    audit: { ...getUserInfo(event), ...logData },
   });
 };
 
