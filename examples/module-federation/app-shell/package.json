@@ -18,7 +18,7 @@
     "webpack-dev-server": "^4.11.1"
   },
   "main": "index.js",
-  "name": "frontend-service-discovery-module-federation-example-appshell",
+  "name": "frontend-discovery-service-module-federation-example-appshell",
   "private": true,
   "scripts": {
     "build": "webpack",

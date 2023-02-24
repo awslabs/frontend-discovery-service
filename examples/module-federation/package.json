@@ -1,5 +1,5 @@
 {
-  "name": "frontend-service-discovery-module-federation-example",
+  "name": "frontend-discovery-service-module-federation-example",
   "private": true,
   "scripts": {
     "build": "npm run build --workspaces",
