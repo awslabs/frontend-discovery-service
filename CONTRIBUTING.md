@@ -27,8 +27,8 @@ We welcome you to use the GitHub issue tracker to report bugs or suggest
 features.
 
 When filing an issue, please check
-[existing open](https://github.com/awslabs/frontend-service-discovery/issues), or
-[recently closed](https://github.com/awslabs/frontend-service-discovery/issues?utf8=%E2%9C%93&q=is%3Aissue%20is%3Aclosed%20),
+[existing open](https://github.com/awslabs/frontend-discovery-service/issues), or
+[recently closed](https://github.com/awslabs/frontend-discovery-service/issues?utf8=%E2%9C%93&q=is%3Aissue%20is%3Aclosed%20),
 issues to make sure somebody else hasn't already reported the issue. Please try
 to include as much information as you can. Details like these are incredibly
 useful:
@@ -71,7 +71,7 @@ GitHub provides additional document on
 Looking at the existing issues is a great way to find something to contribute
 on. As our projects, by default, use the default GitHub issue labels
 (enhancement/bug/duplicate/help wanted/invalid/question/wontfix), looking at any
-['help wanted'](https://github.com/awslabs/frontend-service-discovery/labels/help%20wanted)
+['help wanted'](https://github.com/awslabs/frontend-discovery-service/labels/help%20wanted)
 issues is a great place to start.
 
 ### Code of Conduct
@@ -92,7 +92,7 @@ Please do **not** create a public github issue.
 ### Licensing
 
 See the
-[LICENSE](https://github.com/awslabs/frontend-service-discovery/blob/main/LICENSE)
+[LICENSE](https://github.com/awslabs/frontend-discovery-service/blob/main/LICENSE)
 file for our project's licensing. We will ask you to confirm the licensing of
 your contribution.
 

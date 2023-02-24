@@ -1,8 +1,8 @@
 <h1 align="center">
     Frontend Service Discovery on AWS
     <br>
-    <img src="https://img.shields.io/github/v/release/awslabs/frontend-service-discovery?include_prereleases">
-    <img src="https://github.com/awslabs/frontend-service-discovery/workflows/Unit%20Tests/badge.svg">
+    <img src="https://img.shields.io/github/v/release/awslabs/frontend-discovery-service?include_prereleases">
+    <img src="https://github.com/awslabs/frontend-discovery-service/workflows/Unit%20Tests/badge.svg">
 </h1>
 
 Frontend Service Discovery on AWS is a solution to handle frontend releases on AWS using the [frontend discovery pattern](https://github.com/awslabs/frontend-discovery).

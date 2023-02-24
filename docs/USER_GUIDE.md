@@ -189,7 +189,7 @@ The above functionality is implemented as a middleware using [middy](https://mid
 
 In the case where only one version is currently active, that version will be returned.
 
-Otherwise, the USER_ID as described above is combined with the current active versions to determine a bucket value from 1-100. The bucket value for the Consumer is compared to the traffic distribution configuration for the MicroFrontend to determine the appropriate version to return. Where there is a deployment and the traffic distribution shifts over time, the Consumer will at some point move onto the new version. As the bucket value is consistent for a given set of active versions, the Consumer will then remain on the new version as the deployment continues.
+Otherwise, the `USER_TOKEN` as described above is combined with the current active versions to determine a bucket value from 1-100. The bucket value for the Consumer is compared to the traffic distribution configuration for the MicroFrontend to determine the appropriate version to return. Where there is a deployment and the traffic distribution shifts over time, the Consumer will at some point move onto the new version. As the bucket value is consistent for a given set of active versions, the Consumer will then remain on the new version as the deployment continues.
 
 In the case of any error in this process, the version marked `default` will be returned.
 

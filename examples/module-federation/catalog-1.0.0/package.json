@@ -14,7 +14,7 @@
     "webpack-dev-server": "^4.11.1"
   },
   "main": "index.js",
-  "name": "frontend-service-discovery-module-federation-example-catalog-v1",
+  "name": "frontend-discovery-service-module-federation-example-catalog-v1",
   "private": true,
   "scripts": {
     "build": "webpack --mode production",
