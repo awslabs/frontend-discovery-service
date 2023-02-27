@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Frontend discovery with single-spa example</title>
+  <script id="map" type="systemjs-importmap">
+    {
+      "imports": {
+        "react": "https://cdn.jsdelivr.net/npm/react@17.0.1/umd/react.production.min.js",
+        "react-dom": "https://cdn.jsdelivr.net/npm/react-dom@17.0.1/umd/react-dom.production.min.js",
+        "single-spa": "https://cdn.jsdelivr.net/npm/single-spa@5.8.2/lib/system/single-spa.min.js",
+        "@my-website/app-shell": "//localhost:3001/my-website-app-shell.js"
+      }
+    }
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/systemjs@6.11.0/dist/system.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/systemjs@6.11.0/dist/extras/amd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/systemjs@6.11.0/dist/extras/dynamic-import-maps.min.js"></script>
+  <script>
+    System.import('@my-website/app-shell');
+
+    function load(path) {
+        window.location.href = "/"+path;
+    }
+  </script>
+</head>
+<body>
+    <div>
+        <button id="cs-btn" onclick="load('home')">Load Home MFE</button>
+        <button id="cat-btn" onclick="load('about-us')">Load About Us MFE</button>
+    </div>
+  <import-map-overrides-full show-when-local-storage="devtools" dev-libs></import-map-overrides-full>
+</body>
+</html>
