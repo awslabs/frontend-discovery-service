@@ -1,0 +1,15 @@
+{
+  "name": "frontend-discovery-service-single-spa-example",
+  "private": true,
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "start": "npm start -w app-shell & npm start -w home-1.0.0 & npm start -w home-2.0.0 & npm start -w about-us-1.0.0"
+  },
+  "version": "1.0.0",
+  "workspaces": [
+    "app-shell",
+    "home-1.0.0",
+    "home-2.0.0",
+    "about-us-1.0.0"
+  ]
+}

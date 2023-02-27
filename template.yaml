@@ -191,6 +191,7 @@ Resources:
   ConsumerApi:
     Type: AWS::Serverless::Api
     Properties:
+      Name: Frontend Service Discovery Consumer API
       StageName: !Ref Stage
       Cors: !Sub "'${AccessControlAllowOrigin}'"
       TracingEnabled: true
@@ -332,6 +333,7 @@ Resources:
     Properties:
       StageName: !Ref Stage
       TracingEnabled: true
+      Name: Frontend Service Discovery Admin API
       Auth:
         AddDefaultAuthorizerToCorsPreflight: false
         DefaultAuthorizer: Cognito
