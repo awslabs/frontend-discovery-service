@@ -41,11 +41,14 @@ jobs:
       - name: Install dependencies
         run: |
           npm install
+          npm install --global esbuild #https://github.com/aws/aws-sam-cli/issues/4183
           gem install cfn-nag
       # Run Tests
       - name: CloudFormation unit tests
         run: cfn_nag template.yaml
-      - name: Frontend unit tests
+      - name: Unit tests
         run: npm test
       - name: SAM Validation and linting
-        run: sam build --validate
+        run: |
+          sam validate --lint
+          sam build
