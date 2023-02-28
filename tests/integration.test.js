@@ -25,7 +25,7 @@ let userToken;
 let authToken;
 
 const mfeVersion1 = {
-  url: "https://static.website.com/my-account-1.0.0.js",
+  url: "https://static.example.com/my-account-1.0.0.js",
   fallbackUrl: "https://alt-cdn.com/my-account-1.0.0.js",
   metadata: {
     integrity: "e0d123e5f316bef78bfdf5a008837577",
@@ -34,7 +34,7 @@ const mfeVersion1 = {
 };
 
 const mfeVersion2 = {
-  url: "https://static.website.com/my-account-2.0.0.js",
+  url: "https://static.example.com/my-account-2.0.0.js",
   fallbackUrl: "https://alt-cdn.com/my-account-2.0.0.js",
   metadata: {
     integrity: "e0d123e5f316bef78bfdf5a008837600",
