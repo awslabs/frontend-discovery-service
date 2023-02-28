@@ -212,7 +212,7 @@ The above functionality is implemented [here](../infrastructure/lambda/consumerA
                     "integrity": "e0d123e5f317bef78bfdf5a008837200"
                 },
                 "fallbackUrl": "https://alt-cdn.com/catalog-1.0.0.js",
-                "url": "https://static.website.com/catalog-1.0.0.js"
+                "url": "https://static.example.com/catalog-1.0.0.js"
             }
         ]
     }
@@ -224,7 +224,7 @@ The above functionality is implemented [here](../infrastructure/lambda/consumerA
 ```json
 {
     "version": {
-        "url": "https://static.website.com/catalog-2.0.0.js",
+        "url": "https://static.example.com/catalog-2.0.0.js",
         "metadata": {
             "version": "2.0.0",
             "integrity": "e0d123e5f317bef78bfdf5a008837200"

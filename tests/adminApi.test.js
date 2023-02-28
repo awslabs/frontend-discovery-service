@@ -613,7 +613,7 @@ describe("Admin Api", () => {
         integrity: "e0d123e5f316bef78bfdf5a008837999",
         version: "3.0.0",
       },
-      url: "https://static.website.com/my-account-3.0.0.js",
+      url: "https://static.example.com/my-account-3.0.0.js",
     };
 
     const event = {
@@ -662,7 +662,7 @@ describe("Admin Api", () => {
         integrity: "e0d123e5f316bef78bfdf5a008837999",
         version: "3.0.0",
       },
-      url: "https://static.website.com/my-account-3.0.0.js",
+      url: "https://static.example.com/my-account-3.0.0.js",
     };
 
     const event = {
@@ -716,7 +716,7 @@ describe("Admin Api", () => {
           integrity: "e0d123e5f316bef78bfdf5a008837999",
           version: "3.0.0",
         },
-        url: "https://static.website.com/my-account-3.0.0.js",
+        url: "https://static.example.com/my-account-3.0.0.js",
       };
 
       const event = {
