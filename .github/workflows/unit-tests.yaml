@@ -46,7 +46,7 @@ jobs:
       # Run Tests
       - name: CloudFormation unit tests
         run: cfn_nag template.yaml
-      - name: Frontend unit tests
+      - name: Unit tests
         run: npm test
       - name: SAM Validation and linting
         run: |
