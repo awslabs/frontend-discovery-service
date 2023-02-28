@@ -48,4 +48,6 @@ jobs:
       - name: Frontend unit tests
         run: npm test
       - name: SAM Validation and linting
-        run: sam build --validate
+        run: |
+          sam validate --lint
+          sam build
