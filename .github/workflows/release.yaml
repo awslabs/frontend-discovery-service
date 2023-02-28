@@ -12,17 +12,29 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: git fetch --depth=1 origin +refs/tags/*:refs/tags/* || true
+      # Cache
+      - uses: actions/cache@v1
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
       # Setup
       - name: Set up Python 3.9
         uses: actions/setup-python@v1
         with:
           python-version: 3.9
+      - name: Set up Nodejs 16
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16
       - name: Install virtualenv
         run: pip install virtualenv
       - name: Install dependencies
         run: |
           virtualenv venv
           source venv/bin/activate && pip install cfn-flip==1.3.0
+          npm i
           npm run flip
       # Release if required
       - name: Setup versions in env variables
