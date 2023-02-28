@@ -177,7 +177,7 @@ Example Response:
     "microFrontendId": "27a7928f-9ae2-4f6a-bc51-8478c91f7517",
     "versions": [
         {
-            "url": "https://static.website.com/my-account-1.0.0.js",
+            "url": "https://static.example.com/my-account-1.0.0.js",
             "metadata": {
                 "version": "1.0.0",
                 "integrity": "e0d123e5f316bef78bfdf5a008837577"
@@ -185,7 +185,7 @@ Example Response:
             "fallbackUrl": "https://alt-cdn.com/my-account-1.0.0.js"
         },
         {
-            "url": "https://static.website.com/my-account-2.0.0.js",
+            "url": "https://static.example.com/my-account-2.0.0.js",
             "metadata": {
                 "version": "2.0.0",
                 "integrity": "e0d123e5f316bef78bfdf5a008837600"
@@ -208,7 +208,7 @@ Example Request:
 ```json
 {
     "version": {
-        "url": "https://static.website.com/my-account-4.0.0.js",
+        "url": "https://static.example.com/my-account-4.0.0.js",
         "metadata": {
             "version": "4.0.0",
             "integrity": "e0d123e5f317bef78bfdf5a008837200"
@@ -226,7 +226,7 @@ Example Response:
 {
     "microFrontendId": "27a7928f-9ae2-4f6a-bc51-8478c91f7517",
     "version": {
-        "url": "https://static.website.com/my-account-4.0.0.js",
+        "url": "https://static.example.com/my-account-4.0.0.js",
         "metadata": {
             "version": "4.0.0",
             "integrity": "e0d123e5f317bef78bfdf5a008837200"
@@ -291,7 +291,7 @@ Example Response:
                     "integrity": "e0d123e5f317bef78bfdf5a008837200"
                 },
                 "fallbackUrl": "https://alt-cdn.com/my-account-4.0.0.js",
-                "url": "https://static.website.com/my-account-4.0.0.js"
+                "url": "https://static.example.com/my-account-4.0.0.js"
             }
         ]
     }

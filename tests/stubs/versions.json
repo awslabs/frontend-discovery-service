@@ -7,7 +7,7 @@
           "integrity": "e0d123e5f316bef78bfdf5a008837577",
           "version": "2.0.0"
         },
-        "url": "https://static.website.com/my-account-2.0.0.js"
+        "url": "https://static.example.com/my-account-2.0.0.js"
       },
       "microFrontendId": "1fd2800e-2740-43e5-ad7e-5af54c91f12e",
       "version": "2.0.0"
@@ -19,7 +19,7 @@
           "integrity": "e0d123e5f316bef78bfdf5a008837580",
           "version": "1.2.2"
         },
-        "url": "https://static.website.com/my-account-1.2.2.js"
+        "url": "https://static.example.com/my-account-1.2.2.js"
       },
       "microFrontendId": "1fd2800e-2740-43e5-ad7e-5af54c91f12e",
       "version": "1.2.2"

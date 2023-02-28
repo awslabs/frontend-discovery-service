@@ -18,7 +18,7 @@
             "type": "object",
             "properties": {
               "url": {
-                "$comment": "url of the entrypoint. It can be absolute or relative, and it doesn't mandate Javascript. Valid examples are `/mf.js`, `https://website.com/v1/mf.js`, `https://localhost/entry.html`",
+                "$comment": "url of the entrypoint. It can be absolute or relative, and it doesn't mandate Javascript. Valid examples are `/mf.js`, `https://example.com/v1/mf.js`, `https://localhost/entry.html`",
                 "type": "string"
               },
               "fallbackUrl": {
