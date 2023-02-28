@@ -306,13 +306,18 @@ Resources:
     Type: AWS::Cognito::UserPoolClient
     Properties:
       UserPoolId: !Ref UserPool
+      IdTokenValidity: 1
+      AccessTokenValidity: 1
+      RefreshTokenValidity: 1
+      TokenValidityUnits:
+        AccessToken: hours
+        IdToken: hours
+        RefreshToken: days
       SupportedIdentityProviders:
         - COGNITO
       ExplicitAuthFlows:
         - ALLOW_ADMIN_USER_PASSWORD_AUTH
         - ALLOW_REFRESH_TOKEN_AUTH
-        - ALLOW_USER_SRP_AUTH
-        - ALLOW_CUSTOM_AUTH
 
   CognitoUserPoolAdmin:
     Condition: CreateUser
