@@ -48,10 +48,10 @@ jobs:
       - name: Build Release
         run: |
           sam build
-          cd .aws-sam/build
-          cp ../../cfn-publish.config .
-          zip -r ../../packaged.zip *.*
-          cd ../../
+          zip -r packaged.zip \
+            .aws-sam \
+            infrastructure/stepfunctions \
+            cfn-publish.config
       - name: Upload artefact
         run: aws s3 cp packaged.zip s3://$CFN_BUCKET/frontend-discovery-service/$VERSION/frontend-discovery-service.zip
         env:
