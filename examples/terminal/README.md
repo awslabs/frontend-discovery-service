@@ -8,6 +8,8 @@ This example illustrates usage of this solution in the terminal. It features 3 s
 **admin-deploy.py** - Initiates a deployment for the created MicroFrontend from version 1.0.0 to 2.0.0.
 **consumers** - Simulates 10 users making continual requests to the Consumer API and outputs the versions they receive.
 
+**Note** - It is recommended to use this example in a separate stack deployment to any real resources. Once you have finished with the example, delete the CloudFormation stack.
+
 ## Usage
 
 Create a virtualenv
