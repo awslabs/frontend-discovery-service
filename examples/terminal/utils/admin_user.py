@@ -2,7 +2,9 @@ import random
 import string
 
 username = 'demo'
-pwd = ''.join([random.choice(string.ascii_letters + string.digits + string.punctuation ) for n in range(12)])
+pwd = ''.join([random.choice(string.ascii_letters +
+              string.digits + string.punctuation) for n in range(12)])
+
 
 def setup_admin_user(cognito, userPoolId, cognitoWebClientID):
     delete_admin_user(cognito, userPoolId)
@@ -30,6 +32,7 @@ def setup_admin_user(cognito, userPoolId, cognitoWebClientID):
         ]
     )
 
+
 def delete_admin_user(cognito, userPoolId):
     try:
         cognito.admin_delete_user(
@@ -38,6 +41,7 @@ def delete_admin_user(cognito, userPoolId):
         )
     except:
         pass
+
 
 def initiate_auth(cognito, userPoolId, cognitoWebClientID):
     auth = cognito.admin_initiate_auth(
