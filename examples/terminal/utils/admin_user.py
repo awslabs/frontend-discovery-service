@@ -1,5 +1,8 @@
+import random
+import string
+
 username = 'demo'
-pwd = 'Demopassword123!'
+pwd = ''.join([random.choice(string.ascii_letters + string.digits + string.punctuation ) for n in range(12)])
 
 def setup_admin_user(cognito, userPoolId, cognitoWebClientID):
     delete_admin_user(cognito, userPoolId)
