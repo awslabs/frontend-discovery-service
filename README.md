@@ -58,6 +58,10 @@ own applications. See the [examples](examples) to see some examples on how to in
 - [Local Development](docs/LOCAL_DEVELOPMENT.md)
 - [Examples](examples/README.md)
 
+## Public Material
+
+- [Micro-Frontends Discovery](https://youtu.be/piKByrn-UNM) talk at Micro-Frontends Summit
+
 ## Contributing
 
 Contributions are more than welcome. Please read the
