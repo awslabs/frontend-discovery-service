@@ -36,7 +36,7 @@
   "scripts": {
     "deploy": "sam build && sam deploy",
     "deploy-guided": "sam build && sam deploy --guided",
-    "echo-version": "echo v`node -e \"console.log(require('node-yaml').readSync('template-flipped.yaml').Mappings.Solution.Constants.Version)\"`",
+    "echo-version": "npm run flip && echo v`node -e \"console.log(require('node-yaml').readSync('template-flipped.yaml').Mappings.Solution.Constants.Version)\"`",
     "flip": "cfn-flip -c -n -l template.yaml template-flipped.yaml",
     "format-version": "VERSION=$(npm run echo-version --silent);sed -i '' -e \"3s/.*/Description: Frontend Service Discovery on AWS (uksb-1tthgi8k7) (version:$VERSION)/\" template.yaml",
     "test": "jest"

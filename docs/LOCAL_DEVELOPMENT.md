@@ -20,7 +20,7 @@ commencing development.
 ```bash
 virtualenv venv
 source venv/bin/activate
-pip install pre-commit
+pip install pre-commit cfn-flip
 venv/bin/pre-commit install
 npm install
 ```
