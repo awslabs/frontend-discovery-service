@@ -31,6 +31,10 @@ export const Strategy = {
     increment: [10, 90],
     waitMinutes: 15,
   },
+  AllAtOnce: {
+    increment: 100,
+    waitMinutes: 0
+  }
 };
 
 export const getStates = (mfe, targetVersionNo, strategy) => {

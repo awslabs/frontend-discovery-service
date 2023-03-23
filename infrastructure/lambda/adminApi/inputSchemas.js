@@ -75,6 +75,7 @@ export default {
               "Canary10Percent5Minutes",
               "Canary10Percent10Minutes",
               "Canary10Percent15Minutes",
+              "AllAtOnce"
             ],
           },
         },
@@ -100,6 +101,7 @@ export default {
               "Canary10Percent5Minutes",
               "Canary10Percent10Minutes",
               "Canary10Percent15Minutes",
+              "AllAtOnce"
             ],
           },
         },
