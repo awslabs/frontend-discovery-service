@@ -8,3 +8,6 @@ venv
 template-flipped.yaml
 .DS_Store
 dist
+examples/terminal/.env
+examples/terminal/.venv/
+*.pyc
