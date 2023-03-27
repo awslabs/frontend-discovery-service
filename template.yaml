@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
-Description: Frontend Service Discovery on AWS (uksb-1tthgi8k7) (version:v1.0.1)
+Description: Frontend Service Discovery on AWS (uksb-1tthgi8k7) (version:v1.1)
 
 Globals:
   Function:
@@ -68,7 +68,7 @@ Conditions:
 Mappings:
   Solution:
     Constants:
-      Version: '1.0.1'
+      Version: '1.1'
 
 Resources:
   ProjectStore:
