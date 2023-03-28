@@ -5,15 +5,17 @@
     <img src="https://github.com/awslabs/frontend-discovery-service/workflows/Unit%20Tests/badge.svg">
 </h1>
 
-Frontend Service Discovery on AWS is a solution to handle frontend releases on AWS using the [frontend discovery pattern](https://github.com/awslabs/frontend-discovery).
+Frontend Service Discovery on AWS is a solution to handle frontend releases on AWS using the [frontend discovery pattern](https://github.com/awslabs/frontend-discovery), a system designed by the micro-frontends community with flexibility, portability and security in mind to improve operations.
 
-🐦 Deploy micro-frontends using Canary Releases to improve availability and operations
+🐦 Deploy micro-frontends using **canary releases** to improve availability and operations
 
-🗄️ Organise and manage micro-frontends into multiple projects to handle multi-environment testing and ephemeral releases
+🗄️ Organise and manage micro-frontends into multiple projects to handle **multi-environment** testing and **ephemeral releases**
 
 🛠️ Integrate with the CI/CD tooling of your choice and use the REST API to list micro-frontends, publish new versions, start a deployment or roll-back
 
-🧰 Consume the schema with the technology of your choice to perform client-side or server-side rendering ([See the examples](./examples/))
+🧰 Consume the schema with the technology of your choice to perform client-side or server-side rendering
+
+🔒 Securely configure cross-origin resource sharing and user bucketing strategy
 
 ## Summary
 
