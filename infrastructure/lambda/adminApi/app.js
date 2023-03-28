@@ -495,7 +495,7 @@ export const deleteDeploymentApi = middy().handler(async (event, context) => {
       projectId: projectId,
       microFrontendId: microFrontendId,
     },
-    UpdateExpression: "set activeVersions = :v, #def = :d",
+    UpdateExpression: "set activeVersions = :v, #def = :d remove deploymentId",
     ExpressionAttributeValues: {
       ":v": initState.state.activeVersions,
       ":d": initState.state.default,
