@@ -73,6 +73,7 @@ own applications. See the [examples](examples) to see some examples on how to in
 ## Public Material
 
 - [Micro-Frontends Discovery](https://youtu.be/piKByrn-UNM) talk at Micro-Frontends Summit
+- [Serverless Office Hours - Micro-Frontends ](https://www.youtube.com/watch?v=Vm9jlRSlKVQ) introduction to the frontend discovery service
 
 ## Contributing
 
