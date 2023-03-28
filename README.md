@@ -13,7 +13,7 @@ Frontend Service Discovery on AWS is a solution to handle frontend releases on A
 
 🛠️ Integrate with the CI/CD tooling of your choice and use the REST API to list micro-frontends, publish new versions, start a deployment or roll-back
 
-🧰 Consume the schema with the technology of your choice to perform client-side or server-side rendering
+🧰 Consume the manifest with the technology of your choice to perform client-side or server-side rendering
 
 🔒 Securely configure cross-origin resource sharing and user bucketing strategy
 
