@@ -2,7 +2,7 @@
 
 ## v1.2
 
-- [#14](https://github.com/awslabs/amazon-s3-find-and-forget/pull/14): Add bug affecting deployment of previously cancelled versions
+- [#14](https://github.com/awslabs/amazon-s3-find-and-forget/pull/14): Fix bug affecting deployment of previously cancelled versions
 
 ## v1.1
 
