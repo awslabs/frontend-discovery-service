@@ -8,7 +8,11 @@ import {
   BatchWriteCommand,
   UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
-import { SFNClient, StartExecutionCommand } from "@aws-sdk/client-sfn";
+import {
+  SFNClient,
+  StartExecutionCommand,
+  StopExecutionCommand,
+} from "@aws-sdk/client-sfn";
 import { v4 as uuidv4 } from "uuid";
 
 jest.mock("uuid");
@@ -28,6 +32,7 @@ import {
   patchMFEApi,
   checkCanDeploy,
   deleteMicroFrontendApi,
+  deleteDeploymentApi,
 } from "../infrastructure/lambda/adminApi/app";
 
 const uuidStub = "81149c12-8c00-4ec2-9c03-cca5f1def455";
@@ -38,8 +43,9 @@ process.env.DEPLOYMENT_STORE = "myTable2";
 
 const projectStub = require("./stubs/project.json");
 const mfeStub = require("./stubs/mfe.json");
-const mfeDeploymentStub = require("./stubs/mfeDeployment.json");
+const mfeWithDeploymentStub = require("./stubs/mfeWithDeployment.json");
 const versionsStub = require("./stubs/versions.json");
+const deploymentStub = require("./stubs/deployment.json");
 
 describe("Admin Api", () => {
   beforeEach(() => {
@@ -992,7 +998,7 @@ describe("Admin Api", () => {
           },
           TableName: process.env.FRONTEND_STORE,
         })
-        .resolves({ Items: [mfeDeploymentStub] })
+        .resolves({ Items: [mfeWithDeploymentStub] })
         .on(QueryCommand, {
           KeyConditionExpression:
             "microFrontendId = :microFrontendId And version = :v",
@@ -1113,5 +1119,59 @@ describe("Admin Api", () => {
       expect(error.message).toBe("The specified version could not be found.");
       expect(error.statusCode).toBe(404);
     }
+  });
+
+  test("it deletes an existing deployment", async () => {
+    ddbMock
+      .on(QueryCommand, {
+        KeyConditionExpression: "deploymentId = :deployment",
+        ExpressionAttributeValues: {
+          ":deployment": deploymentStub[0].deploymentId,
+        },
+        TableName: process.env.DEPLOYMENT_STORE,
+      })
+      .resolves({ Items: deploymentStub });
+
+    const event = {
+      headers: { "Content-Type": "application/json" },
+      pathParameters: {
+        projectId: projectStub.projectId,
+        microFrontendId: mfeStub.microFrontendId,
+        deploymentId: deploymentStub[0].deploymentId,
+      },
+    };
+    const result = await deleteDeploymentApi(event, {});
+    const initState = deploymentStub.find((i) => i.sk === "state#0");
+
+    expect(ddbMock).toHaveReceivedCommandWith(UpdateCommand, {
+      TableName: process.env.FRONTEND_STORE,
+      Key: {
+        projectId: projectStub.projectId,
+        microFrontendId: mfeStub.microFrontendId,
+      },
+      UpdateExpression:
+        "set activeVersions = :v, #def = :d remove deploymentId",
+      ExpressionAttributeValues: {
+        ":v": initState.state.activeVersions,
+        ":d": initState.state.default,
+      },
+      ExpressionAttributeNames: {
+        "#def": "default",
+      },
+    });
+    expect(ddbMock).toHaveReceivedCommandWith(UpdateCommand, {
+      TableName: process.env.DEPLOYMENT_STORE,
+      Key: {
+        deploymentId: deploymentStub[0].deploymentId,
+        sk: "detail",
+      },
+      UpdateExpression: "set endedAt = :e, currentStatus = :s",
+      ExpressionAttributeValues: {
+        ":e": expect.any(String),
+        ":s": "CANCELLED",
+      },
+    });
+    expect(sfnMock).toHaveReceivedCommand(StopExecutionCommand);
+    expect(result.statusCode).toBe(204);
   });
 });

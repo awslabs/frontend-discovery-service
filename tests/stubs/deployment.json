@@ -1,0 +1,25 @@
+[
+  {
+    "currentState": 0,
+    "currentStatus": "STARTED",
+    "deploymentId": "e72b2c63-73fa-4e40-a213-a7918c9ae2ac",
+    "expiresAt": 1680256527,
+    "microFrontendId": "057b3bcb-3831-42b8-88aa-ff071a56cc5c",
+    "projectId": "4cfc61f1-8874-4506-a441-e5a735662463",
+    "sk": "detail"
+  },
+  {
+    "deploymentId": "e72b2c63-73fa-4e40-a213-a7918c9ae2ac",
+    "expiresAt": 1680170127,
+    "sk": "state#0",
+    "state": {
+      "activeVersions": [
+        {
+          "traffic": 100,
+          "version": "1.0.0"
+        }
+      ],
+      "default": "1.0.0"
+    }
+  }
+]
