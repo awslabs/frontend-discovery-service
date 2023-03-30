@@ -534,8 +534,6 @@ describe("cancelling a deployment", () => {
         `/projects/${project.id}/microFrontends/${mfe.id}/deployment/${deploymentId}`
       )
       .set("Authorization", authToken);
-
-    deploymentId = response.body.deploymentId;
   });
 
   testIf(runIntegrationTests, "should return 204", () => {
