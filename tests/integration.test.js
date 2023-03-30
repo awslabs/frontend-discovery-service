@@ -20,6 +20,7 @@ let adminApiEndpoint;
 let consumerEndpoint;
 let project = {};
 let mfe = {};
+let deploymentId;
 let firstVersionReceived;
 let userToken;
 let authToken;
@@ -479,6 +480,84 @@ describe("getting an mfe as the same consumer", () => {
       expect(secondVersionReceived).toBe(firstVersionReceived);
     }
   );
+});
+
+describe("reset an mfe active versions", () => {
+  let response;
+  const activeVersions = [
+    { version: mfeVersion1.metadata.version, traffic: 100 },
+  ];
+  beforeAll(async () => {
+    response = await request(adminApiEndpoint)
+      .patch(`/projects/${project.id}/microFrontends/${mfe.id}`)
+      .set("Authorization", authToken)
+      .send({ activeVersions });
+  });
+
+  testIf(runIntegrationTests, "should return 200", () => {
+    expect(response.statusCode).toBe(200);
+  });
+
+  testIf(runIntegrationTests, "should return the given versions", () => {
+    expect(response.body.activeVersions).toStrictEqual(activeVersions);
+  });
+
+  testIf(runIntegrationTests, "should return the given id", () => {
+    expect(response.body.microFrontendId).toBe(mfe.id);
+  });
+});
+
+describe("creating a deployment", () => {
+  let response;
+  beforeAll(async () => {
+    response = await request(adminApiEndpoint)
+      .post(`/projects/${project.id}/microFrontends/${mfe.id}/deployment`)
+      .set("Authorization", authToken)
+      .send({
+        targetVersion: mfeVersion2.metadata.version,
+        deploymentStrategy: "Linear10PercentEvery1Minute",
+      });
+
+    deploymentId = response.body.deploymentId;
+  });
+
+  testIf(runIntegrationTests, "should return 201", () => {
+    expect(response.statusCode).toBe(201);
+  });
+});
+
+describe("cancelling a deployment", () => {
+  let response;
+  beforeAll(async () => {
+    response = await request(adminApiEndpoint)
+      .delete(
+        `/projects/${project.id}/microFrontends/${mfe.id}/deployment/${deploymentId}`
+      )
+      .set("Authorization", authToken);
+
+    deploymentId = response.body.deploymentId;
+  });
+
+  testIf(runIntegrationTests, "should return 204", () => {
+    expect(response.statusCode).toBe(204);
+  });
+});
+
+describe("creating a deployment after cancelling a previous deployment", () => {
+  let response;
+  beforeAll(async () => {
+    response = await request(adminApiEndpoint)
+      .post(`/projects/${project.id}/microFrontends/${mfe.id}/deployment`)
+      .set("Authorization", authToken)
+      .send({
+        targetVersion: mfeVersion2.metadata.version,
+        deploymentStrategy: "AllAtOnce",
+      });
+  });
+
+  testIf(runIntegrationTests, "should return 201", () => {
+    expect(response.statusCode).toBe(201);
+  });
 });
 
 describe("deleting a project", () => {
