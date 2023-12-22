@@ -237,6 +237,10 @@ Example Response:
 }
 ```
 
+Note: When adding the first MicroFrontend version, the "deploymentStrategy" property must be omitted from the payload.
+
+
+
 ---
 ```POST	/projects/{projectId}/microFrontends/{microFrontendId}/deployment	```
 
