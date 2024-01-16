@@ -234,6 +234,7 @@ describe("Admin Api", () => {
         {
           name: `${projectStub.name}/${mfeStub.name}`,
           id: mfeStub.microFrontendId,
+          activeVersions: mfeStub.activeVersions,
         },
       ],
     });
@@ -271,6 +272,7 @@ describe("Admin Api", () => {
         {
           name: `${projectStub.name}/${mfeStub.name}`,
           id: mfeStub.microFrontendId,
+          activeVersions: mfeStub.activeVersions,
           deleted: true,
         },
       ],
@@ -320,6 +322,7 @@ describe("Admin Api", () => {
       projectId: projectStub.projectId,
       name: `${projectStub.name}/${mfeStub.name}`,
       microFrontendId: event.pathParameters.microFrontendId,
+      activeVersions: mfeStub.activeVersions,
       versions: versionsStub.Items.map((v) => v.data),
     });
     expect(result.statusCode).toBe(200);

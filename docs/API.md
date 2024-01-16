@@ -91,7 +91,13 @@ Example Response:
     "microFrontends": [
         {
             "name": "my-project/catalog-123",
-            "id": "27a7928f-9ae2-4f6a-bc51-8478c91f7517"
+            "id": "27a7928f-9ae2-4f6a-bc51-8478c91f7517",
+            "activeVersions": [
+                {
+                    "traffic": 100,
+                    "version": "2.0.0"
+                }
+            ]
         }
     ]
 }
@@ -175,6 +181,12 @@ Example Response:
 {
     "projectId": "ccc1673f-02aa-48cd-b82a-a7911e7150ab",
     "microFrontendId": "27a7928f-9ae2-4f6a-bc51-8478c91f7517",
+    "activeVersions": [
+        {
+            "traffic": 100,
+            "version": "2.0.0"
+        }
+    ],
     "versions": [
         {
             "url": "https://static.example.com/my-account-1.0.0.js",

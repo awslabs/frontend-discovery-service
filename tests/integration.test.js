@@ -338,6 +338,12 @@ describe("getting a list of frontends for a project", () => {
           {
             name: `${project.name}/${mfe.name}`,
             id: mfe.id,
+            activeVersions: [
+              {
+                version: mfeVersion1.metadata.version,
+                traffic: 100,
+              },
+            ],
           },
         ],
       };
@@ -385,6 +391,12 @@ describe("getting an mfe with versions", () => {
         projectId: project.id,
         microFrontendId: mfe.id,
         name: `${project.name}/${mfe.name}`,
+        activeVersions: [
+          {
+            version: mfeVersion1.metadata.version,
+            traffic: 100,
+          },
+        ],
         versions: [mfeVersion1, mfeVersion2],
       };
       expect(response.body).toStrictEqual(expected);

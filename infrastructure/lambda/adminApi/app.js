@@ -141,6 +141,7 @@ export const getFrontendsApi = middy().handler(async (event, context) => {
     let resultItem = {
       name: `${project.name}/${mfe.name}`,
       id: mfe.microFrontendId,
+      activeVersions: mfe.activeVersions,
     };
     if (mfe.deleted) resultItem.deleted = mfe.deleted;
     return resultItem;
@@ -175,6 +176,7 @@ export const getFrontendVersionsApi = middy().handler(
 
     result.name = `${project.name}/${mfe.name}`;
     result.versions = versions.map((v) => v.data);
+    result.activeVersions = mfe.activeVersions;
 
     return {
       statusCode: 200,
